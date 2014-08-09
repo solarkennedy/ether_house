@@ -58,9 +58,11 @@ void loop () {
   if (pos) {
     char* data = (char *) Ethernet::buffer + pos;
     Serial.println();
-    Serial.println("Got data?");
-    Serial.println(data);
+    Serial.print("Got data. pos: ");
+    Serial.println(pos);
+    Serial.println (data);
   }
 }
+
 
 

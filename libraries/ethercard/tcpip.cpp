@@ -798,3 +798,151 @@ uint16_t EtherCard::packetLoop (uint16_t plen) {
 void EtherCard::persistTcpConnection(bool persist){
     persist_tcp_connection = persist;
 }
+
+// Modified packetLoop to support dhcp sniffing
+uint16_t EtherCard::customPacketLoop (uint16_t plen) {
+    uint16_t len;
+    if(using_dhcp){
+        ether.DhcpStateMachine(plen);
+    }
+
+    if (plen==0) {
+        //Check every 65536 (no-packet) cycles whether we need to retry ARP request for gateway
+        if ((waitgwmac & WGW_INITIAL_ARP || waitgwmac & WGW_REFRESHING) &&
+                delaycnt==0 && isLinkUp()) {
+            client_arp_whohas(gwip);
+			waitgwmac |= WGW_ACCEPT_ARP_REPLY;
+		}
+        delaycnt++;
+        //Initiate TCP/IP session if pending
+        if (tcp_client_state==1 && (waitgwmac & WGW_HAVE_GW_MAC)) { // send a syn
+            tcp_client_state = 2;
+            tcpclient_src_port_l++; // allocate a new port
+            client_syn(((tcp_fd<<5) | (0x1f & tcpclient_src_port_l)),tcp_client_port_h,tcp_client_port_l);
+        }
+		//!@todo this is trying to find mac only once. Need some timeout to make another call if first one doesn't succeed.
+		if(is_lan(myip, dnsip) && !has_dns_mac && !waiting_for_dns_mac) {
+			client_arp_whohas(dnsip);
+			waiting_for_dns_mac = true;
+		}
+		//!@todo this is trying to find mac only once. Need some timeout to make another call if first one doesn't succeed.	
+		if(is_lan(myip, hisip) && !has_dest_mac && !waiting_for_dest_mac) {
+			client_arp_whohas(hisip);
+			waiting_for_dest_mac = true;
+		}
+			
+		return 0;
+    }
+	
+    if (eth_type_is_arp_and_my_ip(plen))
+    {   //Service ARP request
+        if (gPB[ETH_ARP_OPCODE_L_P]==ETH_ARP_OPCODE_REQ_L_V)
+            make_arp_answer_from_request();
+        if (waitgwmac & WGW_ACCEPT_ARP_REPLY && (gPB[ETH_ARP_OPCODE_L_P]==ETH_ARP_OPCODE_REPLY_L_V) && client_store_mac(gwip, gwmacaddr))
+            waitgwmac = WGW_HAVE_GW_MAC;
+		if (!has_dns_mac && waiting_for_dns_mac && client_store_mac(dnsip, destmacaddr)) {
+			has_dns_mac = true;
+			waiting_for_dns_mac = false;
+		}
+		if (!has_dest_mac && waiting_for_dest_mac && client_store_mac(hisip, destmacaddr)){
+			has_dest_mac = true;
+			waiting_for_dest_mac = false;
+		}
+        return 0;
+    }
+	
+    if (eth_type_is_ip_and_my_ip(plen)==0)
+    {   //Not IP so ignoring
+        //!@todo Add other protocols (and make each optional at compile time)
+        return 0;
+    }
+    if (gPB[IP_PROTO_P]==IP_PROTO_ICMP_V && gPB[ICMP_TYPE_P]==ICMP_TYPE_ECHOREQUEST_V)
+    {   //Service ICMP echo request (ping)
+        if (icmp_cb)
+            (*icmp_cb)(&(gPB[IP_SRC_P]));
+        make_echo_reply_from_request(plen);
+        return 0;
+    }
+    if (ether.udpServerListening() && gPB[IP_PROTO_P]==IP_PROTO_UDP_V)
+    {   //Call UDP server handler (callback) if one is defined for this packet
+        if(ether.udpServerHasProcessedPacket(plen))
+            return 0; //An UDP server handler (callback) has processed this packet
+    }
+    if (plen<54 && gPB[IP_PROTO_P]!=IP_PROTO_TCP_V )
+        return 0; //Packet flagged as TCP but shorter than minimum TCP packet length
+    if (gPB[TCP_DST_PORT_H_P]==TCPCLIENT_SRC_PORT_H)
+    {   //Source port is in range reserved (by EtherCard) for client TCP/IP connections
+        if (check_ip_message_is_from(hisip)==0)
+            return 0; //Not current TCP/IP connection (only handle one at a time)
+        if (gPB[TCP_FLAGS_P] & TCP_FLAGS_RST_V)
+        {   //TCP reset flagged
+            if (client_tcp_result_cb)
+                (*client_tcp_result_cb)((gPB[TCP_DST_PORT_L_P]>>5)&0x7,3,0,0);
+            tcp_client_state = 5;
+            return 0;
+        }
+        len = get_tcp_data_len();
+        if (tcp_client_state==2)
+        {   //Waiting for SYN-ACK
+            if ((gPB[TCP_FLAGS_P] & TCP_FLAGS_SYN_V) && (gPB[TCP_FLAGS_P] &TCP_FLAGS_ACK_V))
+            {   //SYN and ACK flags set so this is an acknowledgement to our SYN
+                make_tcp_ack_from_any(0,0);
+                gPB[TCP_FLAGS_P] = TCP_FLAGS_ACK_V|TCP_FLAGS_PUSH_V;
+                if (client_tcp_datafill_cb)
+                    len = (*client_tcp_datafill_cb)((gPB[TCP_SRC_PORT_L_P]>>5)&0x7);
+                else
+                    len = 0;
+                tcp_client_state = 3;
+                make_tcp_ack_with_data_noflags(len);
+            }
+            else
+            {   //Expecting SYN+ACK so reset and resend SYN
+                tcp_client_state = 1; // retry
+                len++;
+                if (gPB[TCP_FLAGS_P] & TCP_FLAGS_ACK_V)
+                    len = 0;
+                make_tcp_ack_from_any(len,TCP_FLAGS_RST_V);
+            }
+            return 0;
+        }
+        if (tcp_client_state==3 && len>0)
+        {   //TCP connection established so read data
+            if (client_tcp_result_cb) {
+                uint16_t tcpstart = TCP_DATA_START; // TCP_DATA_START is a formula
+                if (tcpstart>plen-8)
+                    tcpstart = plen-8; // dummy but save
+                uint16_t save_len = len;
+                if (tcpstart+len>plen)
+                    save_len = plen-tcpstart;
+                (*client_tcp_result_cb)((gPB[TCP_DST_PORT_L_P]>>5)&0x7,0,tcpstart,save_len); //Call TCP handler (callback) function
+
+                if(persist_tcp_connection)
+                {   //Keep connection alive by sending ACK
+                    make_tcp_ack_from_any(len,TCP_FLAGS_PUSH_V);
+                }
+                else
+                {   //Close connection
+                    make_tcp_ack_from_any(len,TCP_FLAGS_PUSH_V|TCP_FLAGS_FIN_V);
+                    tcp_client_state = 6;
+                }
+                return 0;
+            }
+        }
+        if (tcp_client_state != 5)
+        {   //
+            if (gPB[TCP_FLAGS_P] & TCP_FLAGS_FIN_V) {
+                if(tcp_client_state == 3) {
+                    return 0; // In some instances FIN is received *before* DATA.  If that is the case, we just return here and keep looking for the data packet
+                }
+                make_tcp_ack_from_any(len+1,TCP_FLAGS_PUSH_V|TCP_FLAGS_FIN_V);
+                tcp_client_state = 6; // connection terminated
+            } else if (len>0) {
+                make_tcp_ack_from_any(len,0);
+            }
+        }
+        return 0;
+    }
+
+    //If we are here then this is a TCP/IP packet targetted at us and not related to out client connection so accept
+    return accept(hisport, plen);
+}
