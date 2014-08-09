@@ -60,7 +60,7 @@ void loop () {
     Serial.println();
     Serial.print("Got data. pos: ");
     Serial.println(pos);
-    Serial.println (data);
+    Serial.println(data);
   }
 }
 

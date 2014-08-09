@@ -45,6 +45,13 @@ typedef void (*UdpServerCallback)(
     const char *data,   ///< UDP payload data
     uint16_t len);        ///< Length of the payload data
 
+/** This type definition defines the structure of a sniffer event handler callback funtion */
+typedef void (*SnifferCallback)(
+    uint16_t dest_port,    ///< Port the packet was sent to
+    uint8_t src_ip[4],    ///< IP address of the sender
+    const char *data,   ///< UDP payload data
+    uint16_t len);        ///< Length of the payload data
+
 /** This type definition defines the structure of a DHCP Option callback funtion */
 typedef void (*DhcpOptionCallback)(
     uint8_t option,     ///< The option number
@@ -437,26 +444,32 @@ public:
     */
     static void udpServerListenOnPort(UdpServerCallback callback, uint16_t port);
 
+    static void snifferListenOnPort(UdpServerCallback callback, uint16_t port);
+
     /**   @brief  Pause listing on UDP port
     *     @brief  port Port to pause
     */
     static void udpServerPauseListenOnPort(uint16_t port);
+    static void snifferPauseListenOnPort(uint16_t port);
 
     /**   @brief  Resume listing on UDP port
     *     @brief  port Port to pause
     */
     static void udpServerResumeListenOnPort(uint16_t port);
+    static void snifferResumeListenOnPort(uint16_t port);
 
     /**   @brief  Check if UDP server is listening on any ports
     *     @return <i>bool</i> True if listening on any ports
     */
     static bool udpServerListening();                        //called by tcpip, in packetLoop
+    static bool snifferListening();                        //called by tcpip, in packetLoop
 
     /**   @brief  Passes packet to UDP Server
     *     @param  len Not used
     *     @return <i>bool</i> True if packet processed
     */
     static bool udpServerHasProcessedPacket(uint16_t len);    //called by tcpip, in packetLoop
+    static bool snifferHasProcessedPacket(uint16_t len);    //called by tcpip, in packetLoop
 
     // dhcp.cpp
     /**   @brief  Update DHCP state
