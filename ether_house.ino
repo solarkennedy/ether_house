@@ -41,6 +41,8 @@ void setup () {
   Serial.print("Enabling listener for MAC: ");
   printMac(target_mac);
     
+    
+  ping_sweep();
 }
 
 void loop () {
