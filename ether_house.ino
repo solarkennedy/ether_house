@@ -42,7 +42,7 @@ void setup () {
   printMac(target_mac);
     
     
-  ping_sweep();
+  //ping_sweep();
 }
 
 void loop () {
