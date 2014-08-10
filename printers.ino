@@ -11,15 +11,6 @@ void PrintPacket(uint8_t srcmacaddr[6], byte ip[4], const char *data, word len) 
   Serial.println();
 }
 
-void udpSerialPrint(word port, byte ip[4], const char *data, word len) {
-  IPAddress src(ip[0], ip[1], ip[2], ip[3]);
-  Serial.println("Got UDP Packet!");
-  Serial.println(src);
-  Serial.println(port);
-  Serial.println(data);
-  Serial.println(len);
-}
-
 void printMac(uint8_t macaddr[6]) {
   Serial.print(macaddr[0], HEX);
   int i;
@@ -30,3 +21,4 @@ void printMac(uint8_t macaddr[6]) {
   }
   Serial.println();
 }
+

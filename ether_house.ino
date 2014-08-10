@@ -24,7 +24,7 @@ static void my_result_cb (byte status, word off, word len) {
 
 void setup () {
   Serial.begin(115200);
-  Serial.println("\n[getDHCPandDNS]");
+  Serial.println("\nether_house starting");
   
   if (ether.begin(sizeof Ethernet::buffer, mymac) == 0) 
     Serial.println( "Failed to access Ethernet controller");
@@ -33,7 +33,6 @@ void setup () {
     Serial.println("DHCP failed");
   
   ether.printIp("My IP: ", ether.myip);
-  // ether.printIp("Netmask: ", ether.mymask);
   ether.printIp("GW IP: ", ether.gwip);
   ether.printIp("DNS IP: ", ether.dnsip);
 
@@ -45,33 +44,15 @@ void setup () {
   
   ether.snifferListenForMac(&PrintPacket, theirmac);
   Serial.print("Enabling listener for MAC: ");
- printMac(theirmac);
-  
-  ether.udpServerListenOnPort(&udpSerialPrint, 5353);
-  
+  printMac(theirmac);
+    
 }
 
 void loop () {
- /*   
-  ether.packetLoop(ether.packetReceive());
-  
-  if (millis() > timer + REQUEST_RATE) {
-   timer = millis();
-   Serial.println("\n>>> REQ");
-   ether.browseUrl(PSTR("/foo/"), "bar", website, my_result_cb);
- }
- */
 
+  // Normal loop of getting packets if they are available
+  ether.customPacketLoop(ether.packetReceive());
 
-  //word pos = ether.packetLoop(ether.packetReceive());
-  word pos = ether.customPacketLoop(ether.packetReceive());
-  if (pos) {
-    char* data = (char *) Ethernet::buffer + pos;
-    Serial.println();
-    Serial.print("Got Regular Data. pos: ");
-    Serial.println(pos);
-    Serial.println(data);
-  }
   
 }
 
