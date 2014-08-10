@@ -801,6 +801,8 @@ void EtherCard::persistTcpConnection(bool persist){
 
 // Modified packetLoop to support dhcp sniffing
 uint16_t EtherCard::customPacketLoop (uint16_t plen) {
+    enableBroadcast(false);
+    enableMulticast();
     uint16_t len;
     if(using_dhcp){
         ether.DhcpStateMachine(plen);
@@ -850,13 +852,13 @@ uint16_t EtherCard::customPacketLoop (uint16_t plen) {
 		}
         return 0;
     }
-	
-    if (eth_type_is_ip_and_my_ip(plen)==0 && ether.snifferListening())
-    {   // Some other packet that we are interested in 
-        if(ether.snifferHasProcessedPacket(plen))
-            return 0;
-        else
-            return 0; 
+//    if (ether.snifferListening())
+        ether.snifferProcessPacket(plen);
+    if (eth_type_is_ip_and_my_ip(plen)==0)
+    {
+        if (ether.snifferListening())
+            ether.snifferProcessPacket(plen);
+        return 0;
     }
     if (gPB[IP_PROTO_P]==IP_PROTO_ICMP_V && gPB[ICMP_TYPE_P]==ICMP_TYPE_ECHOREQUEST_V)
     {   //Service ICMP echo request (ping)

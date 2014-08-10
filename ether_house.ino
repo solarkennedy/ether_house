@@ -1,10 +1,12 @@
 #include <EtherCard.h>
+#include <IPAddress.h>
 #define REQUEST_RATE 50000 // milliseconds
 
 
 static byte mymac[] = { 0x74,0x69,0x69,0x2D,0x30,0x31 };
 
-static byte theirmac[] = { 0x60,0xbe,0xb5,0x8f,0x3d,0xa7 };
+//static uint8_t theirmac[] = { 0x60,0xbe,0xb5,0x8f,0x3d,0xa7 };
+static uint8_t theirmac[] = { 0xc4, 0x85, 0x08, 0x31, 0x7e, 0x73 };
 
 const char website[] PROGMEM = "archive";
 byte Ethernet::buffer[700];
@@ -40,6 +42,11 @@ void setup () {
   ether.printIp("Server: ", ether.hisip);
   
   timer = - REQUEST_RATE; // start timing out right away
+  
+  ether.snifferListenForMac(&PrintPacket, theirmac);
+  Serial.print("Enabling listener for MAC: ");
+  printMac(theirmac);
+  
 }
 
 void loop () {
@@ -52,17 +59,38 @@ void loop () {
    ether.browseUrl(PSTR("/foo/"), "bar", website, my_result_cb);
  }
  */
- 
+
 
   word pos = ether.customPacketLoop(ether.packetReceive());
   if (pos) {
     char* data = (char *) Ethernet::buffer + pos;
     Serial.println();
-    Serial.print("Got data. pos: ");
+    Serial.print("Got Regular Data. pos: ");
     Serial.println(pos);
     Serial.println(data);
   }
+  
 }
 
 
+//callback that prints received packets to the serial port
+void PrintPacket(uint8_t srcmacaddr[6], byte ip[4], const char *data, word len) {
+  IPAddress src(ip[0], ip[1], ip[2], ip[3]);
+  Serial.println("Got Packet!");
+  Serial.print("Src ip:  "); Serial.println(src);
+  Serial.print("Src Mac: "); printMac(srcmacaddr);
+  Serial.print("Data:    "); Serial.println(data);
+  Serial.print("Size:    "); Serial.println(len);
+  Serial.println();
+}
 
+void printMac(uint8_t macaddr[6]) {
+  Serial.print(macaddr[0], HEX);
+  int i;
+  char tmp[16];
+  for (i=1; i<6; i++) {
+    sprintf(tmp, "%.2X",macaddr[i]); 
+    Serial.print(':'); Serial.print(tmp);
+  }
+  Serial.println();
+}

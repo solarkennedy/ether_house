@@ -14,22 +14,27 @@
 
 typedef struct {
     SnifferCallback callback;
-    uint16_t port;
+    uint8_t srcmacaddr[6];
     bool listening;
 } snifferListener;
 
 snifferListener sniffers[SNIFFER_MAXLISTENERS];
 byte numSniffers = 0;
 
-void EtherCard::snifferListenOnPort(SnifferCallback callback, uint16_t port) {
+
+static uint8_t check_mac_message_is_from(const uint8_t *mac) {
+    return memcmp(gPB + ETH_SRC_MAC, mac, 6) == 0;
+}
+
+void EtherCard::snifferListenForMac(SnifferCallback callback, uint8_t srcmacaddr[6]) {
     if(numSniffers < SNIFFER_MAXLISTENERS)
     {
-        sniffers[numSniffers] = (snifferListener){callback, port, true};
+        sniffers[numSniffers] = (snifferListener){callback, srcmacaddr[6], true};
         numSniffers++;
     }
 }
-
-void EtherCard::snifferPauseListenOnPort(uint16_t port) {
+/*
+void EtherCard::snifferPauseListenForMac(uint8_t srcmacaddr[6]) {
     for(int i = 0; i < numSniffers; i++)
     {
         if(gPB[UDP_DST_PORT_H_P] == (sniffers[i].port >> 8) && gPB[UDP_DST_PORT_L_P] == ((byte) sniffers[i].port)) {
@@ -38,7 +43,7 @@ void EtherCard::snifferPauseListenOnPort(uint16_t port) {
     }
 }
 
-void EtherCard::snifferResumeListenOnPort(uint16_t port) {
+void EtherCard::snifferResumeListenForMac(uint8_t srcmacaddr[6]) {
     for(int i = 0; i < numSniffers; i++)
     {
         if(gPB[UDP_DST_PORT_H_P] == (sniffers[i].port >> 8) && gPB[UDP_DST_PORT_L_P] == ((byte) sniffers[i].port)) {
@@ -46,25 +51,25 @@ void EtherCard::snifferResumeListenOnPort(uint16_t port) {
         }
     }
 }
+*/
 
 bool EtherCard::snifferListening() {
     return numSniffers > 0;
 }
 
-bool EtherCard::snifferHasProcessedPacket(uint16_t plen) {
-    bool packetProcessed = false;
+bool EtherCard::snifferProcessPacket(uint16_t plen) {
     for(int i = 0; i < numSniffers; i++)
     {
-        if(gPB[UDP_DST_PORT_H_P] == (sniffers[i].port >> 8) && gPB[UDP_DST_PORT_L_P] == ((byte) sniffers[i].port) && sniffers[i].listening)
+        if(sniffers[i].listening)
+       // if(check_mac_message_is_from(sniffers[i].srcmacaddr) && sniffers[i].listening)
         {
             uint16_t datalen = (uint16_t) (gPB[UDP_LEN_H_P] << 8)  + gPB[UDP_LEN_L_P] - UDP_HEADER_LEN;
             sniffers[i].callback(
-                sniffers[i].port,
+                gPB + ETH_SRC_MAC,
                 gPB + IP_SRC_P,
                 (const char *) (gPB + UDP_DATA_P),
                 datalen);
-            packetProcessed = true;
         }
     }
-    return packetProcessed;
+    return true;
 }
