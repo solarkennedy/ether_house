@@ -1,14 +1,34 @@
 // Interactions with the remote API
-
 const char api_server[] PROGMEM = "archive";
 
 
 // called when the client request is complete
 static void my_callback (byte status, word off, word len) {
-  Serial.println(">>>");
-  Ethernet::buffer[off+300] = 0;
-  Serial.print((const char*) Ethernet::buffer + off);
-  Serial.println("...");
+  
+  JsonParser<32> parser;
+  
+  int seek_location = find_response( Ethernet::buffer + off, len);
+  Serial.print("Found location in "); Serial.println(seek_location);
+  Serial.print("The offset was "); Serial.println(off);
+  
+  JsonObject root = parser.parse((char*)(Ethernet::buffer +off + seek_location));
+  if (!root.success()) {
+    Serial.println("Failed to decode JSON");
+  } else {
+   char* a = root["1"]["mac"];
+   Serial.println(a);
+ 
+   Serial.println("Decoding all json");
+   for (JsonObjectIterator i=root.begin(); i!=root.end(); ++i) {
+    Serial.println(i.key());
+    Serial.println((char*)i.value());
+   }   
+  }
+  
+  Serial.println("Raw Output:");
+  Serial.print((const char*) Ethernet::buffer + off +  seek_location);
+  Serial.println();
+  Serial.println("-------------");
 }
 
 
@@ -31,3 +51,25 @@ void get_initial_config() {
   memcpy(target_mac, got_mac, sizeof got_mac);  
   
 }
+
+// find_response
+// Returns a integer offset where a http response starts.
+// Returns -1 if it couldn't find the delimiter between the headers and response
+int find_response( byte* haystack, int length) {
+  char needle[] = "\r\n\r\n";
+ // Serial.print("Searching for my needle: "); Serial.println(needle);
+  int foundpos = -1;
+  int needle_length = sizeof needle - 1;
+//  Serial.print("Needle length: "); Serial.println(needle_length);
+  for (int i = 0; (i < length - needle_length); i++) {
+  //  Serial.print("searching at ");     Serial.print(i);
+  //  Serial.print("   Value: "); Serial.write(haystack[i]); Serial.println();
+    if (memcmp(needle, haystack + i, needle_length) == 0) {
+      foundpos = i;
+   //   Serial.println("Found!");
+      return foundpos + needle_length;
+    }
+  }
+  return foundpos;
+}
+ 

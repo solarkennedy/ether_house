@@ -1,5 +1,10 @@
+
+#include <JsonParser.h>
+using namespace ArduinoJson::Parser;
+
 #include <EtherCard.h>
 #include <IPAddress.h>
+
 #define REQUEST_RATE 50000 // milliseconds
 
 static byte my_id = 1;
