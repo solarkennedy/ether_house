@@ -7,7 +7,8 @@ using namespace ArduinoJson::Parser;
 
 #define REQUEST_RATE 50000 // milliseconds
 
-static byte my_id = 1;
+static byte num_houses = 7;
+static byte my_id = 0;
 static byte my_mac[] = { 0x74,0x69,0x69,0x2D,0x30,0x31 };
 
 // Easier to deal with up here than passing pointers
@@ -42,9 +43,7 @@ void setup () {
 
   get_initial_config();
   
-  ether.snifferListenForMac(&PrintPacket, target_mac);
-  Serial.print("Enabling listener for MAC: ");
-  printMac(target_mac);
+
     
     
   //ping_sweep();

@@ -15,20 +15,35 @@ static void my_callback (byte status, word off, word len) {
   if (!root.success()) {
     Serial.println("Failed to decode JSON");
   } else {
-   char* a = root["1"]["mac"];
-   Serial.println(a);
  
-   Serial.println("Decoding all json");
-   for (JsonObjectIterator i=root.begin(); i!=root.end(); ++i) {
-    Serial.println(i.key());
-    Serial.println((char*)i.value());
-   }   
+
   }
   
   Serial.println("Raw Output:");
   Serial.print((const char*) Ethernet::buffer + off +  seek_location);
   Serial.println();
   Serial.println("-------------");
+}
+
+
+void set_target_mac() {
+  ether.browseUrl(PSTR("/macs.json"), "", api_server, macs_parse_callback);
+}
+static void macs_parse_callback (byte status, word off, word len) {
+  JsonParser<32> parser2;
+  int seek_location = find_response( Ethernet::buffer + off, len);
+  JsonArray root2 = parser2.parse((char*)(Ethernet::buffer + off + seek_location));
+  uint8_t received_mac[6] = { 0,0,0,0,0,0 };
+  for ( int i=0 ; i<6 ; i++ ) {
+    received_mac[i] = floor(root2[0][i]);
+  }
+  Serial.print("The MAC to look for appears to be: ");
+  printMac(received_mac);
+  memcpy(target_mac, received_mac, sizeof received_mac); 
+  
+  ether.snifferListenForMac(&PrintPacket, target_mac);
+  Serial.print("Enabling listener for MAC: ");
+  printMac(target_mac);
 }
 
 
@@ -40,15 +55,12 @@ void get_initial_config() {
     Serial.println("DNS failed");
     // TODO: Sleep then reset
   }
+ 
   ether.printIp("Server: ", ether.hisip);
+ 
+  set_target_mac(); 
+ // ether.browseUrl(PSTR("/config"), "", api_server, my_callback);
   
-  ether.browseUrl(PSTR("/config"), "", api_server, my_callback);
-  
-  // TODO Make this come from the API
-  //static byte got_mac[] = { 0x60,0xbe,0xb5,0x8f,0x3d,0xa7 };
-  static byte got_mac[6] = { 0xc4, 0x85, 0x08, 0x31, 0x7e, 0x73 };
-
-  memcpy(target_mac, got_mac, sizeof got_mac);  
   
 }
 
