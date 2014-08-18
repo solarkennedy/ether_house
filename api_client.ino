@@ -1,5 +1,3 @@
-// Interactions with the remote API
-const char api_server[] PROGMEM = "archive";
 
 
 // called when the client request is complete
@@ -28,7 +26,13 @@ static void my_callback (byte status, word off, word len) {
 
 void set_target_mac() {
   ether.browseUrl(PSTR("/macs.json"), "", api_server, macs_parse_callback);
+  while (target_mac[0] == -1) {
+    ether.customPacketLoop(ether.packetReceive());
+  }  
+  Serial.println("Leaving set_target_mac");
+
 }
+  
 static void macs_parse_callback (byte status, word off, word len) {
   JsonParser<32> parser2;
   int seek_location = find_response( Ethernet::buffer + off, len);
@@ -47,22 +51,26 @@ static void macs_parse_callback (byte status, word off, word len) {
 }
 
 
-void get_initial_config() {
-  
-  Serial.println("Fetching intial config from the API");
-  
-  if (!ether.dnsLookup(api_server)) {
-    Serial.println("DNS failed");
-    // TODO: Sleep then reset
+void set_initial_state() {
+  ether.browseUrl(PSTR("/state.json"), "", api_server, state_parse_callback);
+  while (state == -1) {
+    ether.customPacketLoop(ether.packetReceive());
   }
- 
-  ether.printIp("Server: ", ether.hisip);
- 
-  set_target_mac(); 
- // ether.browseUrl(PSTR("/config"), "", api_server, my_callback);
-  
-  
+  Serial.println("Leaving set_initial_state");
 }
+void state_parse_callback (byte status, word off, word len) {
+  JsonParser<32> parser;
+  int seek_location = find_response( Ethernet::buffer + off, len);
+  JsonArray root = parser.parse((char*)(Ethernet::buffer + off + seek_location));
+  for ( int i=0 ; i<num_houses ; i++ ) {
+    // Use bitwise math to store the exact i bit into the state byte
+    int x = floor(root[i]);
+    bitWrite(state, i, x);
+  }
+  Serial.print("State in decimal: "); Serial.println(state);
+  printState(state);
+}
+
 
 // find_response
 // Returns a integer offset where a http response starts.
