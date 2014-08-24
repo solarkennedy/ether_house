@@ -19,3 +19,7 @@ void ping_sweep() {
 
 }
 
+void ping_target() {
+  Serial.println("Pinging target ip");
+  ether.clientIcmpRequest(target_ip);
+}

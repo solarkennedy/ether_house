@@ -15,6 +15,7 @@ const byte my_mac[] = {
   0x74,0x69,0x69,0x2D,0x30,0x31 };
 uint8_t target_mac[6] = { 
   -1,-1,-1,-1,-1,-1 };
+byte target_ip[4] = { 255, 255, 255, 255 };
 byte state = -1;
 
 const char api_server[] PROGMEM = "archive";
@@ -59,6 +60,7 @@ void loop () {
 }
 
 void reboot() {
-  Serial.println("Would reboot now.");
-  while (true);
+  Serial.println("Rebooting now.");
+  delay(100);
+  asm volatile ("  jmp 0");  
 }

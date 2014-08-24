@@ -26,7 +26,7 @@ static void macs_parse_callback (byte status, word off, word len) {
   // Configure a callback for our target mac:
   Serial.print("Enabling listener for MAC: ");
   printMac(target_mac);
-  ether.snifferListenForMac(&PrintPacket, target_mac);
+  ether.snifferListenForMac(&packet_sniffer_callback, target_mac);
 }
 
 
