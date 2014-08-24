@@ -40,13 +40,13 @@ void setup () {
     // TODO: Sleep then reset
   }
   ether.printIp("Server: ", ether.hisip);
+  Serial.println();
 
   set_target_mac();
+  delay(10);
   set_initial_state(); 
 
   Serial.println("Finished initial configuration");
-
-  //ping_sweep();
   Serial.println("Now entering main loop");
 }
 

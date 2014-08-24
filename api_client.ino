@@ -29,18 +29,25 @@ static void macs_parse_callback (byte status, word off, word len) {
 
 
 void set_initial_state() {
+  Serial.println();
+  Serial.println("Entering set_initial_state");
+  Serial.print("State is currently:"); Serial.println(state);
   ether.browseUrl(PSTR("/state.json"), "", api_server, state_parse_callback);
-  while (state == -1) {
-    ether.customPacketLoop(ether.packetReceive());
+  Serial.println("Set callback for state.json");
+  while (state == 255) {
+    ether.packetLoop(ether.packetReceive());
   }
+  delay(10);
   Serial.println("Leaving set_initial_state");
 }
 
 
 void state_parse_callback (byte status, word off, word len) {
-  JsonParser<32> parser;
+  Serial.println("Entering state_parse_callback");
+  JsonParser<12> parser;
   int seek_location = find_response( Ethernet::buffer + off, len);
   JsonArray root = parser.parse((char*)(Ethernet::buffer + off + seek_location));
+  // TODO Error handling
   for ( int i=0 ; i<num_houses ; i++ ) {
     // Use bitwise math to store the exact i bit into the state byte
     int x = floor(root[i]);
