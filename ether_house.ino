@@ -42,7 +42,7 @@ void setup () {
   ether.printIp("Server: ", ether.hisip);
   Serial.println();
 
-  set_target_mac();
+  //set_target_mac();
   delay(10);
   set_initial_state(); 
 
