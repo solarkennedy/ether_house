@@ -6,13 +6,16 @@ void set_target_mac() {
   }
   delay(10);
 }
+
+
 static void macs_parse_callback (byte status, word off, word len) {
   Serial.println("Entering macs_parse_callback");
   JsonParser<10> parser2;
   int seek_location = find_response( Ethernet::buffer + off, len);
   //TODO Error handling
   JsonArray root2 = parser2.parse((char*)(Ethernet::buffer + off + seek_location));
-  uint8_t received_mac[6] = { 0,0,0,0,0,0 };
+  uint8_t received_mac[6] = { 
+    0,0,0,0,0,0   };
   for ( int i=0 ; i<6 ; i++ ) {
     received_mac[i] = floor(root2[i]);
   }
@@ -32,6 +35,8 @@ void set_initial_state() {
   }
   Serial.println("Leaving set_initial_state");
 }
+
+
 void state_parse_callback (byte status, word off, word len) {
   JsonParser<32> parser;
   int seek_location = find_response( Ethernet::buffer + off, len);
@@ -41,7 +46,8 @@ void state_parse_callback (byte status, word off, word len) {
     int x = floor(root[i]);
     bitWrite(state, i, x);
   }
-  Serial.print("State in decimal: "); Serial.println(state);
+  Serial.print("State in decimal: "); 
+  Serial.println(state);
   printState(state);
 }
 
@@ -61,4 +67,5 @@ int find_response( byte* haystack, int length) {
   }
   return foundpos;
 }
- 
+
+

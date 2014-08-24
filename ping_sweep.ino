@@ -7,12 +7,15 @@ void ping_sweep() {
   for (int i = 1; i < 255; i++) {
     Serial.print(".");
     uint8_t ip[4];
-    ip[0] = ether.myip[0]; ip[1] = ether.myip[1]; ip[2] = ether.myip[2];
+    ip[0] = ether.myip[0]; 
+    ip[1] = ether.myip[1]; 
+    ip[2] = ether.myip[2];
     ip[3] = i; 
     // Don't care about replies, just want a ping sweep.
     ether.clientIcmpRequest(ip);
   }
   Serial.println();
   Serial.println("Ping sweep finished");
-  
+
 }
+
