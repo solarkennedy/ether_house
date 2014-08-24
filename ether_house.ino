@@ -29,14 +29,11 @@ void setup () {
 
   if (ether.begin(sizeof Ethernet::buffer, my_mac, cspin) == 0) {
     Serial.println( "Failed to access Ethernet controller");
-    delay(100000);
-    reboot();
+    reboot_after_delay();
   }
-
   if (!ether.dhcpSetup()) {
     Serial.println("DHCP failed");
-    delay(100000);
-    reboot();
+    reboot_after_delay();
   }
 
   ether.printIp("My IP: ", ether.myip);
@@ -44,8 +41,7 @@ void setup () {
   ether.printIp("DNS IP: ", ether.dnsip);
   if (!ether.dnsLookup(api_server)) {
     Serial.println("DNS failed");
-    delay(100000);
-    reboot();
+    reboot_after_delay();
   }
   ether.printIp("Server: ", ether.hisip);
   Serial.println();
@@ -69,4 +65,9 @@ void reboot() {
   Serial.println("Rebooting now.");
   delay(100);
   asm volatile ("  jmp 0");  
+}
+
+void reboot_after_delay() {
+  delay(10000);
+  reboot();
 }

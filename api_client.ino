@@ -12,7 +12,6 @@ void set_target_mac() {
   delay(10);
 }
 
-
 static void macs_parse_callback (byte status, word off, word len) {
   Serial.println("Entering macs_parse_callback");
   int seek_location = find_response(Ethernet::buffer + off, len);
@@ -25,7 +24,6 @@ static void macs_parse_callback (byte status, word off, word len) {
   printMac(target_mac);
   ether.snifferListenForMac(&packet_sniffer_callback, target_mac);
 }
-
 
 void set_initial_state() {
   Serial.println();
@@ -46,7 +44,6 @@ void set_initial_state() {
   Serial.println("Leaving set_initial_state");
 }
 
-
 void state_parse_callback (byte status, word off, word len) {
   Serial.println("Entering state_parse_callback");
   int seek_location = find_response( Ethernet::buffer + off, len);
@@ -56,7 +53,6 @@ void state_parse_callback (byte status, word off, word len) {
   Serial.println(state);
   printState(state);
 }
-
 
 // find_response
 // Returns a integer offset where a http response starts.
@@ -73,6 +69,3 @@ int find_response( byte* haystack, int length) {
   }
   return foundpos;
 }
-
-
-
