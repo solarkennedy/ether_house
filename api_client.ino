@@ -1,13 +1,7 @@
-
-
 void set_target_mac() {
   Serial.println("Retrieving target MAC address from server...");
-  //char my_id_char[] = { my_id + 48 };
-  //ether.browseUrl(PSTR("/1.json"), "" , api_server, macs_parse_callback);
   ether.browseUrl(PSTR("/macs.json?id="), my_id_char , api_server, macs_parse_callback);
-
-  while (target_mac[0] == 255) {
-   
+  while (target_mac[0] == 255) { 
     ether.packetLoop(ether.packetReceive());
   }
   delay(10);
@@ -57,16 +51,11 @@ void state_parse_callback (byte status, word off, word len) {
 // Returns -1 if it couldn't find the delimiter between the headers and response
 int find_response( byte* haystack, int length) {
   char needle[] = "\r\n\r\n";
- // Serial.print("Searching for my needle: "); Serial.println(needle);
   int foundpos = -1;
   int needle_length = sizeof needle - 1;
-//  Serial.print("Needle length: "); Serial.println(needle_length);
   for (int i = 0; (i < length - needle_length); i++) {
-  //  Serial.print("searching at ");     Serial.print(i);
-  //  Serial.print("   Value: "); Serial.write(haystack[i]); Serial.println();
     if (memcmp(needle, haystack + i, needle_length) == 0) {
       foundpos = i;
-   //   Serial.println("Found!");
       return foundpos + needle_length;
     }
   }
