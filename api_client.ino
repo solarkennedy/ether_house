@@ -1,53 +1,33 @@
 
 
-// called when the client request is complete
-static void my_callback (byte status, word off, word len) {
-  
-  JsonParser<32> parser;
-  
-  int seek_location = find_response( Ethernet::buffer + off, len);
-  Serial.print("Found location in "); Serial.println(seek_location);
-  Serial.print("The offset was "); Serial.println(off);
-  
-  JsonObject root = parser.parse((char*)(Ethernet::buffer +off + seek_location));
-  if (!root.success()) {
-    Serial.println("Failed to decode JSON");
-  } else {
- 
-
-  }
-  
-  Serial.println("Raw Output:");
-  Serial.print((const char*) Ethernet::buffer + off +  seek_location);
-  Serial.println();
-  Serial.println("-------------");
-}
-
-
 void set_target_mac() {
-  ether.browseUrl(PSTR("/macs.json"), "", api_server, macs_parse_callback);
-  while (target_mac[0] == -1) {
-    ether.customPacketLoop(ether.packetReceive());
-  }  
-  Serial.println("Leaving set_target_mac");
+  Serial.println("Retrieving target MAC address from server...");
+  //char my_id_char[] = { my_id + 48 };
+  //ether.browseUrl(PSTR("/1.json"), "" , api_server, macs_parse_callback);
+  ether.browseUrl(PSTR("/macs.json?id="), my_id_char , api_server, macs_parse_callback);
 
+  while (target_mac[0] == 255) {
+   
+    ether.packetLoop(ether.packetReceive());
+  }
+  delay(10);
 }
-  
 static void macs_parse_callback (byte status, word off, word len) {
-  JsonParser<32> parser2;
+  Serial.println("Entering macs_parse_callback");
+  JsonParser<10> parser2;
   int seek_location = find_response( Ethernet::buffer + off, len);
+  //TODO Error handling
   JsonArray root2 = parser2.parse((char*)(Ethernet::buffer + off + seek_location));
   uint8_t received_mac[6] = { 0,0,0,0,0,0 };
   for ( int i=0 ; i<6 ; i++ ) {
-    received_mac[i] = floor(root2[0][i]);
+    received_mac[i] = floor(root2[i]);
   }
-  Serial.print("The MAC to look for appears to be: ");
-  printMac(received_mac);
+  // Now that we have a MAC to look for, save it to target_mac
   memcpy(target_mac, received_mac, sizeof received_mac); 
-  
-  ether.snifferListenForMac(&PrintPacket, target_mac);
+  // Configure a callback for our target mac:
   Serial.print("Enabling listener for MAC: ");
   printMac(target_mac);
+  ether.snifferListenForMac(&PrintPacket, target_mac);
 }
 
 
