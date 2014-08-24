@@ -6,6 +6,7 @@ using namespace ArduinoJson::Parser;
 #include <IPAddress.h>
 #define cspin 10
 #define REQUEST_RATE 50000 // milliseconds
+#define TIMEOUT 10000
 
 #define num_houses 8
 #define my_id 0
@@ -42,7 +43,7 @@ void setup () {
   ether.printIp("Server: ", ether.hisip);
   Serial.println();
 
-  //set_target_mac();
+  set_target_mac();
   delay(10);
   set_initial_state(); 
 
@@ -51,14 +52,13 @@ void setup () {
 }
 
 void loop () {
-
   // Normal loop of getting packets if they are available
   //ether.customPacketLoop(ether.packetReceive());
   Serial.println("In Main loop");
   delay(10000);
-
 }
 
-
-
-
+void reboot() {
+  Serial.println("Would reboot now.");
+  while (true);
+}
