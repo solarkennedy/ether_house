@@ -18,9 +18,6 @@ static void macs_parse_callback (byte status, word off, word len) {
   int seek_location = find_response(Ethernet::buffer + off, len);
   uint8_t received_mac[6] = { 
     0,0,0,0,0,0     };
-
-  // memcpreceived_mac[i] = (char*)(Ethernet::buffer + off + seek_location + i);
-
   // Now that we have a MAC to look for, save it to target_mac
   memcpy(target_mac, (Ethernet::buffer + off + seek_location), sizeof received_mac); 
   // Configure a callback for our target mac:

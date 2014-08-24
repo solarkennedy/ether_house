@@ -27,25 +27,31 @@ void setup () {
   Serial.begin(115200);
   Serial.println("\nether_house starting");
 
-  if (ether.begin(sizeof Ethernet::buffer, my_mac, cspin) == 0) 
+  if (ether.begin(sizeof Ethernet::buffer, my_mac, cspin) == 0) {
     Serial.println( "Failed to access Ethernet controller");
+    delay(100000);
+    reboot();
+  }
 
-  if (!ether.dhcpSetup())
+  if (!ether.dhcpSetup()) {
     Serial.println("DHCP failed");
+    delay(100000);
+    reboot();
+  }
 
   ether.printIp("My IP: ", ether.myip);
   ether.printIp("GW IP: ", ether.gwip);
   ether.printIp("DNS IP: ", ether.dnsip);
-
   if (!ether.dnsLookup(api_server)) {
     Serial.println("DNS failed");
-    // TODO: Sleep then reset
+    delay(100000);
+    reboot();
   }
   ether.printIp("Server: ", ether.hisip);
   Serial.println();
 
   set_target_mac();
-  delay(10);
+  delay(1000);
   set_initial_state(); 
 
   Serial.println("Finished initial configuration");
