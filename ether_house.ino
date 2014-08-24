@@ -4,7 +4,7 @@ using namespace ArduinoJson::Parser;
 
 #include <EtherCard.h>
 #include <IPAddress.h>
-
+#define cspin 10
 #define REQUEST_RATE 50000 // milliseconds
 
 #define num_houses 8
@@ -25,7 +25,7 @@ void setup () {
   Serial.begin(115200);
   Serial.println("\nether_house starting");
 
-  if (ether.begin(sizeof Ethernet::buffer, my_mac) == 0) 
+  if (ether.begin(sizeof Ethernet::buffer, my_mac, cspin) == 0) 
     Serial.println( "Failed to access Ethernet controller");
 
   if (!ether.dhcpSetup())
