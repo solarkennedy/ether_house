@@ -9,11 +9,7 @@ void set_target_mac() {
     }
     ether.packetLoop(ether.packetReceive());
   }
-  timer = millis() + TIMEOUT;
-  // Give the tcp stack time to fin/ack
-  while (millis() < timer) {
-    ether.packetLoop(ether.packetReceive());
-  }
+  while( ether.packetLoop(ether.packetReceive()));
 }
 
 static void macs_parse_callback (byte status, word off, word len) {
@@ -26,6 +22,7 @@ static void macs_parse_callback (byte status, word off, word len) {
   // Configure a callback for our target mac:
   Serial.print("Enabling listener for MAC: ");
   printMac(target_mac);
+  // While we still a connection, let it it wait for the syn/ack stuff
   ether.snifferListenForMac(&packet_sniffer_callback, target_mac);
 }
 
@@ -43,11 +40,8 @@ void set_initial_state() {
       reboot_after_delay(); 
     }
   }
-  timer = millis() + TIMEOUT;
-  // Give the tcp stack time to fin/ack
-  while (millis() < timer) {
-    ether.packetLoop(ether.packetReceive());
-  }
+  // While we still a connection, let it it wait for the syn/ack stuff
+  while( ether.packetLoop(ether.packetReceive()));
   Serial.println("Leaving set_initial_state");
 }
 

@@ -47,7 +47,6 @@ void setup () {
   Serial.println();
 
   set_target_mac();
-  delay(10000);
   set_initial_state(); 
 
   Serial.println("Finished initial configuration");
