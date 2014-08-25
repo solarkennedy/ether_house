@@ -18,7 +18,7 @@ uint8_t target_mac[6] = {
 byte target_ip[4] = { 255, 255, 255, 255 };
 byte state = -1;
 
-const char api_server[] PROGMEM = "archive";
+const char api_server[] PROGMEM = "archive.gateway.2wire.net";
 
 byte Ethernet::buffer[700];
 static long timer;
@@ -47,7 +47,7 @@ void setup () {
   Serial.println();
 
   set_target_mac();
-  delay(1000);
+  delay(10000);
   set_initial_state(); 
 
   Serial.println("Finished initial configuration");
@@ -68,6 +68,6 @@ void reboot() {
 }
 
 void reboot_after_delay() {
-  delay(10000);
+  delay(100000);
   reboot();
 }

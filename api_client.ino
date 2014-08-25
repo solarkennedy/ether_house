@@ -9,7 +9,11 @@ void set_target_mac() {
     }
     ether.packetLoop(ether.packetReceive());
   }
-  delay(10);
+  timer = millis() + TIMEOUT;
+  // Give the tcp stack time to fin/ack
+  while (millis() < timer) {
+    ether.packetLoop(ether.packetReceive());
+  }
 }
 
 static void macs_parse_callback (byte status, word off, word len) {
@@ -31,16 +35,19 @@ void set_initial_state() {
   Serial.print("State is currently:"); 
   Serial.println(state);
   ether.browseUrl(PSTR("/state"), "", api_server, state_parse_callback);
-  Serial.println("Set callback for state");
   uint32_t timer = millis() + TIMEOUT;
   while (state == 255) {
+     ether.packetLoop(ether.packetReceive());
     if (millis() > timer) {
       Serial.println("Timeout occured.");
-      reboot(); 
+      reboot_after_delay(); 
     }
+  }
+  timer = millis() + TIMEOUT;
+  // Give the tcp stack time to fin/ack
+  while (millis() < timer) {
     ether.packetLoop(ether.packetReceive());
   }
-  delay(10);
   Serial.println("Leaving set_initial_state");
 }
 
