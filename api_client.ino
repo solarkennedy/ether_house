@@ -26,7 +26,7 @@ static void macs_parse_callback (byte status, word off, word len) {
   ether.snifferListenForMac(&packet_sniffer_callback, target_mac);
 }
 
-void set_initial_state() {
+void set_state() {
   Serial.println();
   Serial.println("Entering set_initial_state");
   Serial.print("State is currently:"); 
@@ -53,6 +53,7 @@ void state_parse_callback (byte status, word off, word len) {
   Serial.print("State in decimal: "); 
   Serial.println(state);
   printState(state);
+  sync_leds();
 }
 
 // find_response

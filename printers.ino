@@ -22,3 +22,11 @@ void printState(byte the_state) {
   }
 }
 
+void print_netcfg() {
+  ether.printIp("My IP: ", ether.myip);
+  ether.printIp("GW IP: ", ether.gwip);
+  ether.printIp("DNS IP: ", ether.dnsip);
+  ether.printIp("Server: ", ether.hisip);
+  Serial.println();
+}
+

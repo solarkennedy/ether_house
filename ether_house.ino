@@ -26,6 +26,7 @@ static long timer;
 void setup () {
   Serial.begin(115200);
   Serial.println("\nether_house starting");
+  setup_pins();
 
   if (ether.begin(sizeof Ethernet::buffer, my_mac, cspin) == 0) {
     Serial.println( "Failed to access Ethernet controller");
@@ -35,19 +36,15 @@ void setup () {
     Serial.println("DHCP failed");
     reboot_after_delay();
   }
-
-  ether.printIp("My IP: ", ether.myip);
-  ether.printIp("GW IP: ", ether.gwip);
-  ether.printIp("DNS IP: ", ether.dnsip);
   if (!ether.dnsLookup(api_server)) {
     Serial.println("DNS failed");
     reboot_after_delay();
   }
-  ether.printIp("Server: ", ether.hisip);
-  Serial.println();
+
+  print_netcfg();
 
   set_target_mac();
-  set_initial_state(); 
+  set_state(); 
 
   Serial.println("Finished initial configuration");
   Serial.println("Now entering main loop");
