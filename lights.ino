@@ -9,11 +9,8 @@ void turn_off(int house){
 }
 
 void sync_leds() {
-  boolean led=0;
   for ( int i=0 ; i<num_houses ; i++ ) {
-    led = bitRead(state, i);
-    Serial.print("Setting led "); Serial.print(i); Serial.print(" to value "); Serial.println(led);
-    digitalWrite(i+2, led);
+    digitalWrite(i+2, bitRead(state, i));
   }
 }
 
