@@ -56,6 +56,22 @@ void state_parse_callback (byte status, word off, word len) {
   sync_leds();
 }
 
+void api_set_off(int id) {
+  char id_array[1] = { id };
+  ether.browseUrl(PSTR("off.php?id="), id_array, api_server, api_set_callback);
+}
+
+void api_set_on(int id) {
+  char id_array[1] = { id };
+  ether.browseUrl(PSTR("on.php?id="), id_array, api_server, api_set_callback);
+}
+
+void api_set_callback (byte status, word off, word len) {
+  Serial.println("Entering state_parse_callback");
+  int seek_location = find_response( Ethernet::buffer + off, len);
+  // TODO Error handling
+}
+
 // find_response
 // Returns a integer offset where a http response starts.
 // Returns -1 if it couldn't find the delimiter between the headers and response
