@@ -5,12 +5,15 @@ using namespace ArduinoJson::Parser;
 #include <EtherCard.h>
 #include <IPAddress.h>
 #define cspin 10
-#define REQUEST_RATE 50000 // milliseconds
+#define REQUEST_RATE 50000
+// Ping our target every 2 seconds
+#define PINGER_RATE 2000
 #define TIMEOUT 10000
 
 #define num_houses 8
 #define my_id 0
 #define my_id_char "0"
+
 const byte my_mac[] = { 
   0x74,0x69,0x69,0x2D,0x30,0x31 };
 uint8_t target_mac[6] = { 
@@ -22,6 +25,7 @@ const char api_server[] PROGMEM = "archive.gateway.2wire.net";
 
 byte Ethernet::buffer[700];
 static long timer;
+static long pinger_timer;
 
 void setup () {
   Serial.begin(115200);
@@ -48,13 +52,21 @@ void setup () {
 
   Serial.println("Finished initial configuration");
   Serial.println("Now entering main loop");
+  
+  // Setup timers
+  pinger_timer = - PINGER_RATE ; 
 }
 
 void loop () {
   // Normal loop of getting packets if they are available
-  //ether.customPacketLoop(ether.packetReceive());
-  Serial.println("In Main loop");
-  delay(10000);
+  ether.customPacketLoop(ether.packetReceive());
+  
+  // Ping our target to see if they are alive
+  if (millis() > pinger_timer + PINGER_RATE) {
+    pinger_timer = millis();
+    ping_target();
+  }
+  
 }
 
 void reboot() {
