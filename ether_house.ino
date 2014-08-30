@@ -19,6 +19,8 @@ const byte my_mac[] = {
 uint8_t target_mac[6] = { 
   -1,-1,-1,-1,-1,-1 };
 byte target_ip[4] = { 255, 255, 255, 255 };
+byte allZeros[] = { 0x00, 0x00, 0x00, 0x00 };
+byte allOnes[] = { 0xFF, 0xFF, 0xFF, 0xFF };
 byte state = -1;
 
 const char api_server[] PROGMEM = "archive.gateway.2wire.net";

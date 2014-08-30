@@ -20,6 +20,23 @@ void ping_sweep() {
 }
 
 void ping_target() {
-  Serial.println("Pinging target ip");
-  ether.clientIcmpRequest(target_ip);
+  // Don't bother trying to ping anything that isn't local to the lan.
+  if (is_ip_local(target_ip) == true) {
+    ether.printIp("Pinging target ip: ", target_ip);
+    ether.clientIcmpRequest(target_ip);
+  }
 }
+
+// Filter to only look at packets that are coming from a legit ip.
+boolean is_ip_local(byte ip[4]) {
+  if (memcmp(ip, allOnes, 4) == 0 || memcmp(ip, allZeros, 4) == 0 ) {
+   return false;
+  }
+  for(int i = 0; i < 4; i++)
+    if((ether.myip[i] & EtherCard::netmask[i]) != (ip[i] & EtherCard::netmask[i])) {
+      return false;
+    }
+  // If we got here then it is legit
+  return true;
+}
+
