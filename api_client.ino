@@ -1,4 +1,4 @@
-void set_target_mac() {
+void get_target_mac() {
   Serial.println("Retrieving target MAC address from server...");
   ether.browseUrl(PSTR("/target_mac?id="), my_id_char , api_server, macs_parse_callback);
   uint32_t timer = millis() + TIMEOUT;
@@ -26,7 +26,7 @@ static void macs_parse_callback (byte status, word off, word len) {
   ether.snifferListenForMac(&packet_sniffer_callback, target_mac);
 }
 
-void set_state() {
+void get_remote_state() {
   Serial.println();
   Serial.println("Entering set_initial_state");
   Serial.print("State is currently:"); 

@@ -43,8 +43,8 @@ void setup () {
 
   print_netcfg();
 
-  set_target_mac();
-  set_state(); 
+  get_target_mac();
+  get_remote_state(); 
 
   Serial.println("Finished initial configuration");
   Serial.println("Now entering main loop");
