@@ -6,7 +6,9 @@
 #define PINGER_RATE 2000
 #define TIMEOUT 10000
 // A device is gone if we haven't heard from them in 15 minutes
-#define ABSENSE_TIMEOUT 900000
+#define ABSENSE_TIMEOUT 90000
+//#define ABSENSE_TIMEOUT 900000
+
 #define NUM_HOUSES 8
 #define MY_ID 0
 #define MY_ID_CHAR "0"
@@ -68,9 +70,8 @@ void loop () {
   }
   
   // If we haven't heard from our device, time to time out and turn off
-  if (millis() > absense_timer + ABSENSE_TIMEOUT) {
-    absense_timer = millis();
-    Serial.println("Haven't hearf from our target. Assuming it is gone.");
+  if ((millis() > absense_timer + ABSENSE_TIMEOUT) && (bitRead(state, MY_ID) == true)) {
+    Serial.println("Haven't heard from our target. Assuming it is gone.");
     turn_off(MY_ID);
   }
   
