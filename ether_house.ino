@@ -4,6 +4,8 @@
 #define REQUEST_RATE 50000
 // Ping our target every 2 seconds
 #define PINGER_RATE 2000
+// Ping everything every hour
+#define PINGSWEEP_RATE 3600000
 #define TIMEOUT 10000
 // A device is gone if we haven't heard from them in 15 minutes
 #define ABSENSE_TIMEOUT 90000
@@ -25,7 +27,7 @@ byte Ethernet::buffer[700];
 static long timer;
 static long pinger_timer;
 static long absense_timer;
-
+static long pingsweep_timer;
 
 void setup () {
   Serial.begin(115200);
@@ -57,6 +59,9 @@ void setup () {
   pinger_timer = millis() - PINGER_RATE ; 
   // Start the absense timer with the total grace period to give it the benifit of the doubt
   absense_timer = millis();
+  // We can start the ping sweep on bootup.
+  pingsweep_timer = millis() - PINGSWEEP_RATE;
+  
 }
 
 void loop () {
@@ -73,6 +78,12 @@ void loop () {
   if ((millis() > absense_timer + ABSENSE_TIMEOUT) && (bitRead(state, MY_ID) == true)) {
     Serial.println("Haven't heard from our target. Assuming it is gone.");
     turn_off(MY_ID);
+  }
+  
+  // After a long time we ping everything in case we don't even know what ip our device has
+  if (millis() > pingsweep_timer + PINGSWEEP_RATE) {
+    pingsweep_timer = millis();
+    ping_sweep();
   }
   
 }
