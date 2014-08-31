@@ -1,13 +1,21 @@
 void turn_on(int house) {
-  Serial.print("Turning ON house "); Serial.println(house);
-  bitWrite(state, house, 1);
-  sync_leds();
+  toggle_house(house, true);
 }
 
 void turn_off(int house){
-  Serial.print("Turning OFF house "); Serial.println(house);
-  bitWrite(state, house, 0);
-  sync_leds();
+  toggle_house(house, false);
+}
+
+void toggle_house(int house, boolean value) {
+  // If the state is actually different than what we currently have
+  if (bitRead(state, house) != value) {
+    Serial.print("Turning house "); 
+    Serial.print(house);
+    Serial.print(" to value "); 
+    Serial.println(value);
+    bitWrite(state, house, value);
+    sync_leds();
+  }
 }
 
 void sync_leds() {
@@ -21,4 +29,6 @@ void setup_pins() {
     pinMode(i+2, OUTPUT);
   }
 }
+
+
 

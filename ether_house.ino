@@ -52,7 +52,7 @@ void setup () {
   Serial.println("Now entering main loop");
   
   // Setup timers
-  pinger_timer = millis(); 
+  pinger_timer = millis() - PINGER_RATE ; 
   // Start the absense timer with the total grace period to give it the benifit of the doubt
   absense_timer = millis();
 }
