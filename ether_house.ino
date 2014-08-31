@@ -1,18 +1,14 @@
-
-#include <JsonParser.h>
-using namespace ArduinoJson::Parser;
-
 #include <EtherCard.h>
 #include <IPAddress.h>
-#define cspin 10
+#define CSPIN 10
 #define REQUEST_RATE 50000
 // Ping our target every 2 seconds
 #define PINGER_RATE 2000
 #define TIMEOUT 10000
 
-#define num_houses 8
-#define my_id 0
-#define my_id_char "0"
+#define NUM_HOUSES 8
+#define MY_ID 0
+#define MY_ID_CHAR "0"
 
 const byte my_mac[] = { 
   0x74,0x69,0x69,0x2D,0x30,0x31 };
@@ -34,7 +30,7 @@ void setup () {
   Serial.println("\nether_house starting");
   setup_pins();
 
-  if (ether.begin(sizeof Ethernet::buffer, my_mac, cspin) == 0) {
+  if (ether.begin(sizeof Ethernet::buffer, my_mac, CSPIN) == 0) {
     Serial.println( "Failed to access Ethernet controller");
     reboot_after_delay();
   }

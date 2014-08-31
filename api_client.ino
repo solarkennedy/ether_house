@@ -1,6 +1,6 @@
 void get_target_mac() {
   Serial.println("Retrieving target MAC address from server...");
-  ether.browseUrl(PSTR("/target_mac?id="), my_id_char , api_server, macs_parse_callback);
+  ether.browseUrl(PSTR("/target_mac?id="), MY_ID_CHAR , api_server, macs_parse_callback);
   uint32_t timer = millis() + TIMEOUT;
   while (target_mac[0] == 255) { 
     if (millis() > timer) {

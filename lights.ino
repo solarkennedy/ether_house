@@ -9,13 +9,13 @@ void turn_off(int house){
 }
 
 void sync_leds() {
-  for ( int i=0 ; i<num_houses ; i++ ) {
+  for ( int i=0 ; i<NUM_HOUSES ; i++ ) {
     digitalWrite(i+2, bitRead(state, i));
   }
 }
 
 void setup_pins() {
-  for ( int i=0 ; i<num_houses ; i++ ) {
+  for ( int i=0 ; i<NUM_HOUSES ; i++ ) {
     pinMode(i+2, OUTPUT);
   }
 }
