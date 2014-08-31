@@ -18,8 +18,11 @@ void packet_sniffer_callback(uint8_t srcmacaddr[6], byte ip[4], const char *data
 
   // Only copy the ip as a target if it is local.
   // Everything else is bogus.
-  if (is_ip_local(ip) == true)
+  if (is_ip_local(ip) == true) {
+    absense_timer = millis();
+    turn_on(MY_ID);
     memcpy(target_ip, ip, sizeof target_ip);
+  }
 }
 
 

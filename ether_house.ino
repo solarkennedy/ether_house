@@ -5,6 +5,8 @@
 // Ping our target every 2 seconds
 #define PINGER_RATE 2000
 #define TIMEOUT 10000
+// A device is gone if we haven't heard from them in 15 minutes
+#define ABSENSE_TIMEOUT 900000
 #define NUM_HOUSES 8
 #define MY_ID 0
 #define MY_ID_CHAR "0"
@@ -20,6 +22,8 @@ byte state = -1;
 byte Ethernet::buffer[700];
 static long timer;
 static long pinger_timer;
+static long absense_timer;
+
 
 void setup () {
   Serial.begin(115200);
@@ -48,7 +52,9 @@ void setup () {
   Serial.println("Now entering main loop");
   
   // Setup timers
-  pinger_timer = - PINGER_RATE ; 
+  pinger_timer = millis(); 
+  // Start the absense timer with the total grace period to give it the benifit of the doubt
+  absense_timer = millis();
 }
 
 void loop () {
@@ -59,6 +65,13 @@ void loop () {
   if (millis() > pinger_timer + PINGER_RATE) {
     pinger_timer = millis();
     ping_target();
+  }
+  
+  // If we haven't heard from our device, time to time out and turn off
+  if (millis() > absense_timer + ABSENSE_TIMEOUT) {
+    absense_timer = millis();
+    Serial.println("Haven't hearf from our target. Assuming it is gone.");
+    turn_off(MY_ID);
   }
   
 }

@@ -1,9 +1,11 @@
 void turn_on(int house) {
+  Serial.print("Turning ON house "); Serial.println(house);
   bitWrite(state, house, 1);
   sync_leds();
 }
 
 void turn_off(int house){
+  Serial.print("Turning OFF house "); Serial.println(house);
   bitWrite(state, house, 0);
   sync_leds();
 }
