@@ -5,22 +5,18 @@
 // Ping our target every 2 seconds
 #define PINGER_RATE 2000
 #define TIMEOUT 10000
-
 #define NUM_HOUSES 8
 #define MY_ID 0
 #define MY_ID_CHAR "0"
 
-const byte my_mac[] = { 
-  0x74,0x69,0x69,0x2D,0x30,0x31 };
-uint8_t target_mac[6] = { 
-  -1,-1,-1,-1,-1,-1 };
-byte target_ip[4] = { 255, 255, 255, 255 };
-byte allZeros[] = { 0x00, 0x00, 0x00, 0x00 };
-byte allOnes[] = { 0xFF, 0xFF, 0xFF, 0xFF };
-byte state = -1;
-
+const byte my_mac[] = {   0x74,0x69,0x69,0x2D,0x30,0x31 };
+const byte allZeros[] = { 0x00, 0x00, 0x00, 0x00 };
+const byte allOnes[] = { 0xFF, 0xFF, 0xFF, 0xFF };
 const char api_server[] PROGMEM = "archive.gateway.2wire.net";
 
+uint8_t target_mac[6] = {   -1,-1,-1,-1,-1,-1 };
+byte target_ip[4] = { 255, 255, 255, 255 };
+byte state = -1;
 byte Ethernet::buffer[700];
 static long timer;
 static long pinger_timer;
