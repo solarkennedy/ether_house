@@ -192,6 +192,7 @@ static void make_echo_reply_from_request(uint16_t len) {
     if (gPB[ICMP_CHECKSUM_P] > (0xFF-0x08))
         gPB[ICMP_CHECKSUM_P+1]++;
     gPB[ICMP_CHECKSUM_P] += 0x08;
+    Serial.println("Responding to ICMP");
     EtherCard::packetSend(len);
 }
 

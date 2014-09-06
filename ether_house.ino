@@ -68,23 +68,28 @@ void loop () {
   // Normal loop of getting packets if they are available
   ether.customPacketLoop(ether.packetReceive());
   
-  // Ping our target to see if they are alive
-  if (millis() > pinger_timer + PINGER_RATE) {
-    pinger_timer = millis();
-    ping_target();
-  }
+//  // Ping our target to see if they are alive
+//  if (millis() > pinger_timer + PINGER_RATE) {
+//    pinger_timer = millis();
+//    ping_target();
+//  }
+//  
+//  // If we haven't heard from our device, time to time out and turn off
+//  if ((millis() > absense_timer + ABSENSE_TIMEOUT) && (bitRead(state, MY_ID) == true)) {
+//    Serial.println("Haven't heard from our target. Assuming it is gone.");
+//    Serial.print("Millis: "); Serial.println(millis());
+//    turn_off(MY_ID);
+//  }
+//  
+//  // After a long time we ping everything in case we don't even know what ip our device has
+//  if (millis() > pingsweep_timer + PINGSWEEP_RATE) {
+//    pingsweep_timer = millis();
+//    ping_sweep();
+//  }
   
-  // If we haven't heard from our device, time to time out and turn off
-  if ((millis() > absense_timer + ABSENSE_TIMEOUT) && (bitRead(state, MY_ID) == true)) {
-    Serial.println("Haven't heard from our target. Assuming it is gone.");
-    turn_off(MY_ID);
-  }
-  
-  // After a long time we ping everything in case we don't even know what ip our device has
-  if (millis() > pingsweep_timer + PINGSWEEP_RATE) {
-    pingsweep_timer = millis();
-    ping_sweep();
-  }
+  // Cover the case where I am unplugged and must reset myself
+//  if (ENC28J60::isLinkUp() == false)
+//    reboot_after_delay();
   
 }
 
@@ -95,6 +100,7 @@ void reboot() {
 }
 
 void reboot_after_delay() {
+  Serial.println("Starting delay for a reboot.");
   delay(100000);
   reboot();
 }
