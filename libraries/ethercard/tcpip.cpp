@@ -801,8 +801,6 @@ void EtherCard::persistTcpConnection(bool persist){
 
 // Modified packetLoop to support dhcp sniffing
 uint16_t EtherCard::customPacketLoop (uint16_t plen) {
-    enableBroadcast(false);
-    enableMulticast();
     uint16_t len;
     if(using_dhcp){
         ether.DhcpStateMachine(plen);
