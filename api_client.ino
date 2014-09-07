@@ -1,6 +1,6 @@
 void get_target_mac() {
   Serial.println("Retrieving target MAC address from server...");
-  ether.browseUrl(PSTR("/target_mac?id="), MY_ID_CHAR , api_server, macs_parse_callback);
+  ether.browseUrl(PSTR("/target_mac?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "" , api_server, macs_parse_callback);
   uint32_t timer = millis() + TIMEOUT;
   while (target_mac[0] == 255) { 
     if (millis() > timer) {
@@ -31,7 +31,7 @@ void get_remote_state() {
   Serial.println("Entering set_initial_state");
   Serial.print("State is currently:"); 
   Serial.println(state);
-  ether.browseUrl(PSTR("/state"), "", api_server, state_parse_callback);
+  ether.browseUrl(PSTR("/state?api_key=" MY_API_KEY), "", api_server, state_parse_callback);
   uint32_t timer = millis() + TIMEOUT;
   while (state == 255) {
      ether.packetLoop(ether.packetReceive());
@@ -56,14 +56,12 @@ void state_parse_callback (byte status, word off, word len) {
   sync_leds();
 }
 
-void api_set_off(int id) {
-  char id_array[1] = { id };
-  ether.browseUrl(PSTR("off.php?id="), id_array, api_server, api_set_callback);
+void api_set_off() {
+  ether.browseUrl(PSTR("off?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
 }
 
-void api_set_on(int id) {
-  char id_array[1] = { id };
-  ether.browseUrl(PSTR("on.php?id="), id_array, api_server, api_set_callback);
+void api_set_on() {
+  ether.browseUrl(PSTR("on?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
 }
 
 void api_set_callback (byte status, word off, word len) {
