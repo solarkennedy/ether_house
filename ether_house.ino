@@ -78,7 +78,7 @@ void loop () {
   // If we haven't heard from our device, time to time out and turn off
   if ((millis() > absense_timer + ABSENSE_TIMEOUT) && (bitRead(state, MY_ID) == true)) {
     Serial.println("Haven't heard from our target. Assuming it is gone.");
-    turn_off(MY_ID);
+    turn_my_house_off();
   }
   
   // After a long time we ping everything in case we don't even know what ip our device has

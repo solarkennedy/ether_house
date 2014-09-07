@@ -5,7 +5,7 @@ void packet_sniffer_callback(uint8_t srcmacaddr[6], byte ip[4], const char *data
   ether.printIp(ip);
   Serial.println();
   absense_timer = millis();
-  turn_on(MY_ID);
+  turn_my_house_on();
   /*
  Serial.print("Src Mac: "); 
    printMac(srcmacaddr);
