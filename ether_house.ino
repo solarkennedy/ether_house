@@ -14,7 +14,7 @@
 #define NUM_HOUSES 8
 #define MY_ID 0
 #define MY_ID_CHAR "0"
-#define MY_API_KEY "TESTc0b971bf92e06c8ed732020742cc2984"
+#define MY_API_KEY "TESTKEY1"
 
 const byte my_mac[] = { 0x74,0x69,0x69,0x2D,0x30,MY_ID };
 const byte allZeros[] = { 0x00, 0x00, 0x00, 0x00 };
