@@ -1,5 +1,7 @@
+#include <EEPROM.h>
 #include <EtherCard.h>
 #include <IPAddress.h>
+
 #define CSPIN 10
 #define REQUEST_RATE 50000
 // Ping our target every 2 seconds
@@ -12,7 +14,7 @@
 //#define ABSENSE_TIMEOUT 900000
 
 #define NUM_HOUSES 8
-#define MY_ID 0
+int MY_ID;
 #define MY_ID_CHAR "0"
 #define MY_API_KEY "TESTKEY1"
 
@@ -34,6 +36,8 @@ void setup () {
   Serial.begin(115200);
   Serial.println("\nether_house starting");
   setup_pins();
+  
+  MY_ID = EEPROM.read(0x00);
 
   if (ether.begin(sizeof Ethernet::buffer, my_mac, CSPIN) == 0) {
     Serial.println( "Failed to access Ethernet controller");
