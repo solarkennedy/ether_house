@@ -6,6 +6,8 @@
 #define PINGER_INTERVAL 2000
 // Ping everything every hour
 #define PINGSWEEP_INTERVAL 36000
+// How often to check back to the server for sync updates
+#define SYNC_INTERVAL 36000
 // General timeout for API calls and such
 #define HTTP_TIMEOUT 10000
 // A device is gone if we haven't heard from them in 15 minutes
@@ -17,19 +19,26 @@
 #define MY_ID_CHAR "0"
 #define MY_API_KEY "testkey"
 
-const byte my_mac[] = { 0x74,0x69,0x69,0x2D,0x30,MY_ID };
-const byte allZeros[] = { 0x00, 0x00, 0x00, 0x00 };
-const byte allOnes[] = { 0xFF, 0xFF, 0xFF, 0xFF };
+const byte my_mac[] = { 
+  0x74,0x69,0x69,0x2D,0x30,MY_ID };
+const byte allZeros[] = { 
+  0x00, 0x00, 0x00, 0x00 };
+const byte allOnes[] = { 
+  0xFF, 0xFF, 0xFF, 0xFF };
 const char api_server[] PROGMEM = "etherhouse.xkyle.com";
 
-uint8_t target_mac[6] = {   -1,-1,-1,-1,-1,-1 };
-byte target_ip[4] = { 255, 255, 255, 255 };
+uint8_t target_mac[6] = {   
+  -1,-1,-1,-1,-1,-1 };
+byte target_ip[4] = { 
+  255, 255, 255, 255 };
 byte state = -1;
 byte Ethernet::buffer[700];
 static long timer;
 static long pinger_timer;
 static long absense_timer;
 static long pingsweep_timer;
+static long sync_timer;
+
 
 void setup () {
   Serial.begin(115200);
@@ -56,38 +65,46 @@ void setup () {
 
   Serial.println("Finished initial configuration");
   Serial.println("Now entering main loop");
-  
+
   // Setup timers
   pinger_timer = millis() - PINGER_INTERVAL ; 
   // Start the absense timer with the total grace period to give it the benifit of the doubt
   absense_timer = millis();
   // We can start the ping sweep on bootup.
   pingsweep_timer = millis() - PINGSWEEP_INTERVAL;
-  
+  // We already got the state from above. Setup the next issue.
+  sync_timer = millis() - SYNC_INTERVAL;
+
 }
 
 void loop () {
   // Normal loop of getting packets if they are available
   ether.customPacketLoop(ether.packetReceive());
-  
+
   // Ping our target to see if they are alive
   if (millis() > pinger_timer + PINGER_INTERVAL) {
     pinger_timer = millis();
     ping_target();
   }
-  
+
   // If we haven't heard from our device, time to time out and turn off
   if ((millis() > absense_timer + ABSENSE_TIMEOUT) && (bitRead(state, MY_ID) == true)) {
     Serial.println("Haven't heard from our target. Assuming it is gone.");
     turn_my_house_off();
   }
-  
+
   // After a long time we ping everything in case we don't even know what ip our device has
   if (millis() > pingsweep_timer + PINGSWEEP_INTERVAL) {
     pingsweep_timer = millis();
     ping_sweep();
   }
-  
+
+  if (millis() > sync_timer + SYNC_INTERVAL) {
+    sync_timer = millis();
+    sync_my_state();
+  }
+
+
 }
 
 void reboot() {
@@ -100,3 +117,4 @@ void reboot_after_delay() {
   delay(100000);
   reboot();
 }
+
