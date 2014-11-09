@@ -101,7 +101,7 @@ void loop () {
 
   if (millis() > sync_timer + SYNC_INTERVAL) {
     sync_timer = millis();
-    sync_my_state();
+    get_remote_state();
   }
 
 

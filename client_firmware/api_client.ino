@@ -49,7 +49,6 @@ void state_parse_callback (byte status, word off, word len) {
   Serial.println("Entering state_parse_callback");
   int seek_location = find_response( Ethernet::buffer + off, len);
   memcpy(&state, (Ethernet::buffer + off + seek_location), sizeof state);
-  state = (state>>4) | (state<<4);
   Serial.print("State in decimal: "); 
   Serial.println(state);
   printState(state);
@@ -85,12 +84,3 @@ int find_response( byte* haystack, int length) {
   }
   return foundpos;
 }
-
-void sync_my_state() {
-  if (bitRead(state, MY_ID) == 1)
-    api_set_on();
-  else
-    api_set_off();
-  get_remote_state();
-}
-

@@ -13,7 +13,7 @@ void printMac(uint8_t macaddr[6]) {
 
 void printState(byte the_state) {
   Serial.println("Current state:");
-  for (int i=0; i<NUM_HOUSES; i++) {
+  for (int i=NUM_HOUSES-1; i>=0; i--) {
     boolean onoroff = (state >> i) & 1;
     Serial.print("House "); 
     Serial.print(i); 
