@@ -1,7 +1,7 @@
 void get_target_mac() {
   Serial.println("Retrieving target MAC address from server...");
   ether.browseUrl(PSTR("/target_mac?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "" , api_server, macs_parse_callback);
-  uint32_t timer = millis() + TIMEOUT;
+  uint32_t timer = millis() + HTTP_TIMEOUT;
   while (target_mac[0] == 255) { 
     if (millis() > timer) {
       Serial.println("Timeout occured.");
@@ -31,8 +31,8 @@ void get_remote_state() {
   Serial.println("Entering set_initial_state");
   Serial.print("State is currently:"); 
   Serial.println(state);
-  ether.browseUrl(PSTR("/state?api_key=" MY_API_KEY), "", api_server, state_parse_callback);
-  uint32_t timer = millis() + TIMEOUT;
+  ether.browseUrl(PSTR("/state?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, state_parse_callback);
+  uint32_t timer = millis() + HTTP_TIMEOUT;
   while (state == 255) {
      ether.packetLoop(ether.packetReceive());
     if (millis() > timer) {

@@ -1,25 +1,26 @@
 #include <EtherCard.h>
 #include <IPAddress.h>
 #define CSPIN 10
-#define REQUEST_RATE 50000
+// NOTE: All of these timers are in Milliseconds!
 // Ping our target every 2 seconds
-#define PINGER_RATE 2000
+#define PINGER_INTERVAL 2000
 // Ping everything every hour
-#define PINGSWEEP_RATE 3600000
-#define TIMEOUT 10000
+#define PINGSWEEP_INTERVAL 36000
+// General timeout for API calls and such
+#define HTTP_TIMEOUT 10000
 // A device is gone if we haven't heard from them in 15 minutes
-#define ABSENSE_TIMEOUT 90000
+#define ABSENSE_TIMEOUT 30000
 //#define ABSENSE_TIMEOUT 900000
 
 #define NUM_HOUSES 8
 #define MY_ID 0
 #define MY_ID_CHAR "0"
-#define MY_API_KEY "TESTKEY1"
+#define MY_API_KEY "testkey"
 
 const byte my_mac[] = { 0x74,0x69,0x69,0x2D,0x30,MY_ID };
 const byte allZeros[] = { 0x00, 0x00, 0x00, 0x00 };
 const byte allOnes[] = { 0xFF, 0xFF, 0xFF, 0xFF };
-const char api_server[] PROGMEM = "archive.gateway.2wire.net";
+const char api_server[] PROGMEM = "etherhouse.xkyle.com";
 
 uint8_t target_mac[6] = {   -1,-1,-1,-1,-1,-1 };
 byte target_ip[4] = { 255, 255, 255, 255 };
@@ -57,11 +58,11 @@ void setup () {
   Serial.println("Now entering main loop");
   
   // Setup timers
-  pinger_timer = millis() - PINGER_RATE ; 
+  pinger_timer = millis() - PINGER_INTERVAL ; 
   // Start the absense timer with the total grace period to give it the benifit of the doubt
   absense_timer = millis();
   // We can start the ping sweep on bootup.
-  pingsweep_timer = millis() - PINGSWEEP_RATE;
+  pingsweep_timer = millis() - PINGSWEEP_INTERVAL;
   
 }
 
@@ -70,7 +71,7 @@ void loop () {
   ether.customPacketLoop(ether.packetReceive());
   
   // Ping our target to see if they are alive
-  if (millis() > pinger_timer + PINGER_RATE) {
+  if (millis() > pinger_timer + PINGER_INTERVAL) {
     pinger_timer = millis();
     ping_target();
   }
@@ -82,7 +83,7 @@ void loop () {
   }
   
   // After a long time we ping everything in case we don't even know what ip our device has
-  if (millis() > pingsweep_timer + PINGSWEEP_RATE) {
+  if (millis() > pingsweep_timer + PINGSWEEP_INTERVAL) {
     pingsweep_timer = millis();
     ping_sweep();
   }
