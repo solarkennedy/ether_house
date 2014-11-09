@@ -16,7 +16,7 @@ static void macs_parse_callback (byte status, word off, word len) {
   Serial.println("Entering macs_parse_callback");
   int seek_location = find_response(Ethernet::buffer + off, len);
   uint8_t received_mac[6] = { 
-    0,0,0,0,0,0       };
+    0,0,0,0,0,0         };
   // Now that we have a MAC to look for, save it to target_mac
   memcpy(target_mac, (Ethernet::buffer + off + seek_location), sizeof received_mac); 
   // Configure a callback for our target mac:
@@ -28,11 +28,12 @@ static void macs_parse_callback (byte status, word off, word len) {
 
 void get_remote_state() {
   Serial.println();
-  Serial.println("Entering set_initial_state");
+  Serial.println("Syncing State from Server");
   Serial.print("State is currently:"); 
   Serial.println(state);
   ether.browseUrl(PSTR("/state?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, state_parse_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
+  //TODO: Handle this better
   while (state == 255) {
     ether.packetLoop(ether.packetReceive());
     if (millis() > timer) {
@@ -49,7 +50,7 @@ void state_parse_callback (byte status, word off, word len) {
   Serial.println("Entering state_parse_callback");
   int seek_location = find_response( Ethernet::buffer + off, len);
   memcpy(&state, (Ethernet::buffer + off + seek_location), sizeof state);
-  Serial.print("State in decimal: "); 
+  Serial.print("State is now: "); 
   Serial.println(state);
   printState(state);
   sync_leds();
@@ -84,3 +85,4 @@ int find_response( byte* haystack, int length) {
   }
   return foundpos;
 }
+
