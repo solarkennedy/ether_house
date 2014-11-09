@@ -57,11 +57,11 @@ void state_parse_callback (byte status, word off, word len) {
 }
 
 void api_set_off() {
-  ether.browseUrl(PSTR("off?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
+  ether.browseUrl(PSTR("/off?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
 }
 
 void api_set_on() {
-  ether.browseUrl(PSTR("on?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
+  ether.browseUrl(PSTR("/on?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
 }
 
 void api_set_callback (byte status, word off, word len) {
