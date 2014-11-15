@@ -15,9 +15,9 @@ void printState(byte the_state) {
   Serial.println("Current state:");
   for (int i=NUM_HOUSES-1; i>=0; i--) {
     boolean onoroff = (state >> i) & 1;
-    Serial.print("House "); 
+    Serial.print(F("House ")); 
     Serial.print(i); 
-    Serial.print(": "); 
+    Serial.print(F(": ")); 
     Serial.println(onoroff); 
   }
 }

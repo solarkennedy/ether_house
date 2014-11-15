@@ -2,7 +2,7 @@
 void ping_sweep() {
   // Assumes class C. 
   // TODO: Be smarter about the range
-  Serial.print("Beginning ping sweep. Starting at 1 and going to 254...");
+  Serial.print(F("Beginning ping sweep. Starting at 1 and going to 254..."));
   for (int i = 1; i < 255; i++) {
     uint8_t ip[4];
     ip[0] = ether.myip[0]; 

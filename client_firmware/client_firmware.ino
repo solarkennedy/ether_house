@@ -32,7 +32,7 @@ uint8_t target_mac[6] = {
 byte target_ip[4] = { 
   255, 255, 255, 255 };
 byte state = -1;
-byte Ethernet::buffer[700];
+byte Ethernet::buffer[500];
 static long timer;
 static long pinger_timer;
 static long absense_timer;
@@ -42,29 +42,31 @@ static long sync_timer;
 
 void setup () {
   Serial.begin(115200);
-  Serial.println("\nether_house starting");
+  Serial.println(F("\nether_house starting"));
   setup_pins();
 
   if (ether.begin(sizeof Ethernet::buffer, my_mac, CSPIN) == 0) {
-    Serial.println( "Failed to access Ethernet controller");
+    Serial.println(F("Failed to access Ethernet controller"));
     reboot_after_delay();
   }
   if (!ether.dhcpSetup()) {
-    Serial.println("DHCP failed");
+    Serial.println(F("DHCP failed"));
     reboot_after_delay();
   }
   if (!ether.dnsLookup(api_server)) {
-    Serial.println("DNS failed");
+    Serial.println(F("DNS failed"));
     reboot_after_delay();
   }
 
   print_netcfg();
 
+  syslog();
+
   get_target_mac();
   get_remote_state(); 
 
-  Serial.println("Finished initial configuration");
-  Serial.println("Now entering main loop");
+  Serial.println(F("Finished initial configuration"));
+  Serial.println(F("Now entering main loop"));
 
   // Setup timers
   pinger_timer = millis() - PINGER_INTERVAL ; 
@@ -89,7 +91,7 @@ void loop () {
 
   // If we haven't heard from our device, time to time out and turn off
   if ((millis() > absense_timer + ABSENSE_TIMEOUT) && (bitRead(state, MY_ID) == true)) {
-    Serial.println("Haven't heard from our target. Assuming it is gone.");
+    Serial.println(F("Haven't heard from our target. Assuming it is gone."));
     turn_my_house_off();
   }
 
@@ -108,7 +110,7 @@ void loop () {
 }
 
 void reboot() {
-  Serial.println("Rebooting now.");
+  Serial.println(F("Rebooting now."));
   delay(100);
   asm volatile ("  jmp 0");  
 }

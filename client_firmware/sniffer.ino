@@ -1,6 +1,6 @@
 //callback that prints received packets to the serial port
 void packet_sniffer_callback(uint8_t srcmacaddr[6], byte ip[4], const char *data, word len) {
-  Serial.print("Got Sniffed Packet from: ");
+  Serial.print(F("Got Sniffed Packet from: "));
   //  Serial.print("Src ip:  "); 
   ether.printIp(ip);
   Serial.println();

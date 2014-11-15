@@ -17,9 +17,9 @@ void turn_my_house_off() {
 void toggle_house(int house, boolean value) {
   // If the state is actually different than what we currently have
   if (bitRead(state, house) != value) {
-    Serial.print("Turning house "); 
+    Serial.print(F("Turning house ")); 
     Serial.print(house);
-    Serial.print(" to value "); 
+    Serial.print(F(" to value ")); 
     Serial.println(value);
     bitWrite(state, house, value);
     sync_leds();
