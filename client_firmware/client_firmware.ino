@@ -49,11 +49,11 @@ void setup () {
     reboot_after_delay();
   }
   if (!ether.dhcpSetup()) {
-    Serial.println(F("DHCP failed"));
+    syslog("DHCP failed");
     reboot_after_delay();
   }
   if (!ether.dnsLookup(api_server)) {
-    Serial.println(F("DNS failed"));
+    syslog("DNS failed");
     reboot_after_delay();
   }
 

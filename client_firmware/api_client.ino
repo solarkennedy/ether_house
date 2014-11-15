@@ -1,10 +1,10 @@
 void get_target_mac() {
-  Serial.println(F("Retrieving target MAC address from server..."));
+  syslog("Retrieving target MAC address from server...");
   ether.browseUrl(PSTR("/target_mac?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "" , api_server, macs_parse_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
   while (target_mac[0] == 255) { 
     if (millis() > timer) {
-      Serial.println(F("Timeout occured."));
+      syslog("Timeout occured when trying to get mac");
       reboot(); 
     }
     ether.packetLoop(ether.packetReceive());
@@ -13,7 +13,6 @@ void get_target_mac() {
 }
 
 static void macs_parse_callback (byte status, word off, word len) {
-  Serial.println(F("Entering macs_parse_callback"));
   int seek_location = find_response(Ethernet::buffer + off, len);
   uint8_t received_mac[6] = { 
     0,0,0,0,0,0         };
@@ -28,7 +27,7 @@ static void macs_parse_callback (byte status, word off, word len) {
 
 void get_remote_state() {
   Serial.println();
-  Serial.println(F("Syncing State from Server"));
+  syslog("Syncing State from Server...");
   Serial.print(F("State is currently:")); 
   Serial.println(state);
   ether.browseUrl(PSTR("/state?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, state_parse_callback);
@@ -37,7 +36,7 @@ void get_remote_state() {
   while (state == 255) {
     ether.packetLoop(ether.packetReceive());
     if (millis() > timer) {
-      Serial.println(F("Timeout occured."));
+      syslog("Timeout occured when trying to fetch state");
       reboot_after_delay(); 
     }
   }

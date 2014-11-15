@@ -13,7 +13,7 @@ void syslog(const char* logstring) {
 
   char buf[string_size+1];
   packet.toCharArray(buf,string_size);
-  ether.sendUdp (buf, string_size, 514, EtherCard::broadcastip, 514);
+  ether.sendUdp (buf, string_size, 514, allOnes, 514);
 
 }
 
