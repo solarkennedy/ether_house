@@ -109,7 +109,7 @@ void loop () {
 }
 
 void reboot() {
-  Serial.println(F("Rebooting now."));
+  syslog("Rebooting now.");
   delay(100);
   asm volatile ("  jmp 0");  
 }
