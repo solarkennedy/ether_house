@@ -39,7 +39,6 @@ static long absense_timer;
 static long pingsweep_timer;
 static long sync_timer;
 
-
 void setup () {
   Serial.begin(115200);
   Serial.println(F("\nether_house starting"));
@@ -60,7 +59,7 @@ void setup () {
 
   print_netcfg();
 
-  syslog();
+  syslog("Etherhouse booting!");
 
   get_target_mac();
   get_remote_state(); 
