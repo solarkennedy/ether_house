@@ -90,7 +90,7 @@ void loop () {
 
   // If we haven't heard from our device, time to time out and turn off
   if ((millis() > absense_timer + ABSENSE_TIMEOUT) && (bitRead(state, MY_ID) == true)) {
-    Serial.println(F("Haven't heard from our target. Assuming it is gone."));
+    syslog("Absense timeout of target. Turning off light "MY_ID_CHAR);
     turn_my_house_off();
   }
 
