@@ -89,7 +89,8 @@ void loop () {
   }
 
   // If we haven't heard from our device, time to time out and turn off
-  if ((millis() > absense_timer + ABSENSE_TIMEOUT) && (bitRead(state, MY_ID) == true)) {
+  // The sniffer callback resets the absense_timer
+  if ((bitRead(state, MY_ID) == true) && (millis() > absense_timer + ABSENSE_TIMEOUT)) {
     syslog("Absense timeout of target. Turning off light "MY_ID_CHAR);
     turn_my_house_off();
   }

@@ -27,7 +27,7 @@ static void macs_parse_callback (byte status, word off, word len) {
 
 void get_remote_state() {
   Serial.println();
-  syslog("Syncing State from Server...");
+  syslog("Syncing State from Server.");
   Serial.print(F("State is currently:")); 
   Serial.println(state);
   ether.browseUrl(PSTR("/state?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, state_parse_callback);
