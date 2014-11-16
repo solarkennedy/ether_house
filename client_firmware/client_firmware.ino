@@ -1,5 +1,6 @@
 #include <EtherCard.h>
 #include <IPAddress.h>
+
 #define CSPIN 10
 // NOTE: All of these timers are in Milliseconds!
 // Ping our target every 2 seconds
@@ -19,7 +20,6 @@
 #define MY_ID_CHAR "0"
 #define MY_API_KEY "testkey"
 
-
 #define BYTETOBINARYPATTERN "%d%d%d%d%d%d%d%d"
 #define BYTETOBINARY(byte)  \
 (byte & 0x80 ? 1 : 0), \
@@ -30,7 +30,6 @@
   (byte & 0x04 ? 1 : 0), \
   (byte & 0x02 ? 1 : 0), \
   (byte & 0x01 ? 1 : 0) 
-
 
 const byte my_mac[] = { 
   0x74,0x69,0x69,0x2D,0x30,MY_ID };
@@ -119,7 +118,6 @@ void loop () {
     get_remote_state();
   }
 
-
 }
 
 void reboot() {
@@ -129,6 +127,7 @@ void reboot() {
 }
 
 void reboot_after_delay() {
+  syslog("Delayed reboot initiated.");
   delay(100000);
   reboot();
 }
