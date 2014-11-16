@@ -66,6 +66,8 @@ void api_set_off() {
       reboot_after_delay(); 
     }
   }
+  // While we still a connection, let it it wait for the syn/ack stuff
+  while( ether.packetLoop(ether.packetReceive()));
 }
 
 void api_set_on() {
@@ -80,6 +82,8 @@ void api_set_on() {
       reboot_after_delay(); 
     }
   }
+  // While we still a connection, let it it wait for the syn/ack stuff
+  while( ether.packetLoop(ether.packetReceive()));
 }
 
 void api_set_callback (byte status, word off, word len) {
@@ -103,8 +107,5 @@ int find_response( byte* haystack, int length) {
   }
   return foundpos;
 }
-
-
-
 
 

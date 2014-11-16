@@ -16,8 +16,8 @@
 //#define ABSENSE_TIMEOUT 900000
 
 #define NUM_HOUSES 8
-#define MY_ID 2
-#define MY_ID_CHAR "2"
+#define MY_ID 0
+#define MY_ID_CHAR "0"
 #define MY_API_KEY "testkey"
 
 #define BYTETOBINARYPATTERN "%d%d%d%d%d%d%d%d"
