@@ -56,7 +56,7 @@ void state_parse_callback (byte status, word off, word len) {
 
 void api_set_off() {
   syslog("Sending OFF for my house: "MY_ID_CHAR);
-  locked = false;
+  locked = true;
   ether.browseUrl(PSTR("/off?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
   while (locked == true) {
     ether.packetLoop(ether.packetReceive());
