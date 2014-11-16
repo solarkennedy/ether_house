@@ -15,7 +15,7 @@ void get_target_mac() {
 static void macs_parse_callback (byte status, word off, word len) {
   int seek_location = find_response(Ethernet::buffer + off, len);
   uint8_t received_mac[6] = { 
-    0,0,0,0,0,0             };
+    0,0,0,0,0,0               };
   // Now that we have a MAC to look for, save it to target_mac
   memcpy(target_mac, (Ethernet::buffer + off + seek_location), sizeof received_mac); 
   // Configure a callback for our target mac:
@@ -58,6 +58,8 @@ void api_set_off() {
   syslog("Sending OFF for my house: "MY_ID_CHAR);
   locked = true;
   ether.browseUrl(PSTR("/off?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
+  uint32_t timer = millis() + HTTP_TIMEOUT;
+
   while (locked == true) {
     ether.packetLoop(ether.packetReceive());
     if (millis() > timer) {
@@ -71,6 +73,8 @@ void api_set_on() {
   syslog("Sending ON for my house: "MY_ID_CHAR);
   locked = true;
   ether.browseUrl(PSTR("/on?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
+  uint32_t timer = millis() + HTTP_TIMEOUT;
+
   while (locked == true) {
     ether.packetLoop(ether.packetReceive());
     if (millis() > timer) {
@@ -101,6 +105,7 @@ int find_response( byte* haystack, int length) {
   }
   return foundpos;
 }
+
 
 
 
