@@ -16,8 +16,8 @@
 //#define ABSENSE_TIMEOUT 900000
 
 #define NUM_HOUSES 8
-#define MY_ID 0
-#define MY_ID_CHAR "0"
+#define MY_ID 2
+#define MY_ID_CHAR "2"
 #define MY_API_KEY "testkey"
 
 #define BYTETOBINARYPATTERN "%d%d%d%d%d%d%d%d"
@@ -55,7 +55,7 @@ bool locked;
 
 void setup () {
   Serial.begin(115200);
-  Serial.println(F("\nether_house starting"));
+  Serial.println(F("\nether_house"MY_ID_CHAR" starting network configuration"));
   setup_pins();
 
   if (ether.begin(sizeof Ethernet::buffer, my_mac, CSPIN) == 0) {
@@ -73,7 +73,7 @@ void setup () {
 
   print_netcfg();
 
-  syslog("Etherhouse booting!");
+  syslog("etherhouse"MY_ID_CHAR" booted!");
 
   get_target_mac();
   get_remote_state(); 
