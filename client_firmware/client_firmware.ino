@@ -87,7 +87,7 @@ void setup () {
   // We can start the ping sweep on bootup.
   pingsweep_timer = millis() - PINGSWEEP_INTERVAL;
   // We already got the state from above. Setup the next issue.
-  sync_timer = millis() - SYNC_INTERVAL;
+  sync_timer = millis();
 
 }
 
