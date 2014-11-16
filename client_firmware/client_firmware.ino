@@ -51,7 +51,7 @@ static long absense_timer;
 static long pingsweep_timer;
 static long sync_timer;
 
-bool locked;
+volatile bool locked;
 
 void setup () {
   Serial.begin(115200);

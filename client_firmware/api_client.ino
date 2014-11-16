@@ -4,16 +4,17 @@ void get_target_mac() {
   uint32_t timer = millis() + HTTP_TIMEOUT;
   locked = true;
   while (locked == true) { 
+    ether.packetLoop(ether.packetReceive());
     if (millis() > timer) {
       syslog("Timeout occured when trying to get mac");
       reboot(); 
     }
-    ether.packetLoop(ether.packetReceive());
   }
   while( ether.packetLoop(ether.packetReceive()));
 }
 
 static void macs_parse_callback (byte status, word off, word len) {
+
   int seek_location = find_response(Ethernet::buffer + off, len);
   memcpy(target_mac, (Ethernet::buffer + off + seek_location), sizeof target_mac); 
   // Configure a callback for our target mac:
@@ -21,7 +22,7 @@ static void macs_parse_callback (byte status, word off, word len) {
   printMac(target_mac);
   // While we still a connection, let it it wait for the syn/ack stuff
   ether.snifferListenForMac(&packet_sniffer_callback, target_mac);
-  locked == false;
+  locked = false;
 }
 
 void get_remote_state() {
@@ -102,4 +103,8 @@ int find_response( byte* haystack, int length) {
   }
   return foundpos;
 }
+
+
+
+
 
