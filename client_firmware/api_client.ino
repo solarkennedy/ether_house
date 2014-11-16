@@ -14,7 +14,7 @@ void get_target_mac() {
       reboot(); 
     }
   }
-  while( ether.packetLoop(ether.packetReceive()));
+  wait_for_tcp();
 }
 
 static void macs_parse_callback (byte status, word off, word len) {
@@ -48,8 +48,7 @@ void get_remote_state() {
       reboot_after_delay(); 
     }
   }
-  // While we still a connection, let it it wait for the syn/ack stuff
-  while( ether.packetLoop(ether.packetReceive()));
+  wait_for_tcp();
 }
 
 void state_parse_callback (byte status, word off, word len) {
@@ -79,8 +78,7 @@ void api_set_off() {
       reboot_after_delay(); 
     }
   }
-  // While we still a connection, let it it wait for the syn/ack stuff
-  while( ether.packetLoop(ether.packetReceive()));
+  wait_for_tcp();
 }
 
 void api_set_on() {
@@ -100,8 +98,7 @@ void api_set_on() {
       reboot_after_delay(); 
     }
   }
-  // While we still a connection, let it it wait for the syn/ack stuff
-  while( ether.packetLoop(ether.packetReceive()));
+  wait_for_tcp();
 }
 
 void api_set_callback (byte status, word off, word len) {
@@ -126,4 +123,11 @@ int find_response( byte* haystack, int length) {
   return foundpos;
 }
 
+void wait_for_tcp() {
+  uint32_t timer = millis() + HTTP_TIMEOUT;
+    // While we still a connection, let it it wait for the syn/ack stuff
+  while(millis() < timer){
+    ether.packetLoop(ether.packetReceive());
+  }
+}
 
