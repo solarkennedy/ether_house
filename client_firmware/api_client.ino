@@ -2,7 +2,8 @@ void get_target_mac() {
   syslog("Retrieving target MAC address from server...");
   ether.browseUrl(PSTR("/target_mac?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "" , api_server, macs_parse_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
-  while (target_mac[0] == 255) { 
+  locked = true;
+  while (locked == true) { 
     if (millis() > timer) {
       syslog("Timeout occured when trying to get mac");
       reboot(); 
@@ -14,15 +15,13 @@ void get_target_mac() {
 
 static void macs_parse_callback (byte status, word off, word len) {
   int seek_location = find_response(Ethernet::buffer + off, len);
-  uint8_t received_mac[6] = { 
-    0,0,0,0,0,0               };
-  // Now that we have a MAC to look for, save it to target_mac
-  memcpy(target_mac, (Ethernet::buffer + off + seek_location), sizeof received_mac); 
+  memcpy(target_mac, (Ethernet::buffer + off + seek_location), sizeof target_mac); 
   // Configure a callback for our target mac:
   Serial.print(F("Enabling listener for MAC: "));
   printMac(target_mac);
   // While we still a connection, let it it wait for the syn/ack stuff
   ether.snifferListenForMac(&packet_sniffer_callback, target_mac);
+  locked == false;
 }
 
 void get_remote_state() {
@@ -59,7 +58,6 @@ void api_set_off() {
   locked = true;
   ether.browseUrl(PSTR("/off?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
-
   while (locked == true) {
     ether.packetLoop(ether.packetReceive());
     if (millis() > timer) {
@@ -74,7 +72,6 @@ void api_set_on() {
   locked = true;
   ether.browseUrl(PSTR("/on?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
-
   while (locked == true) {
     ether.packetLoop(ether.packetReceive());
     if (millis() > timer) {
@@ -105,7 +102,4 @@ int find_response( byte* haystack, int length) {
   }
   return foundpos;
 }
-
-
-
 
