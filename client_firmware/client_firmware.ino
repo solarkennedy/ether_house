@@ -43,7 +43,7 @@ uint8_t target_mac[6] = {
   -1,-1,-1,-1,-1,-1 };
 byte target_ip[4] = { 
   255, 255, 255, 255 };
-byte state = -1;
+byte state = 0; //No houses on at first
 byte Ethernet::buffer[500];
 static long timer;
 static long pinger_timer;
