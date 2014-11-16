@@ -28,8 +28,8 @@ static void macs_parse_callback (byte status, word off, word len) {
 void get_remote_state() {
   Serial.println();
   syslog("Syncing State from Server.");
-  Serial.print(F("State is currently:")); 
-  Serial.println(state);
+  //Serial.print(F("State is currently:")); 
+  //Serial.println(state);
   ether.browseUrl(PSTR("/state?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, state_parse_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
   //TODO: Handle this better
@@ -47,9 +47,13 @@ void get_remote_state() {
 void state_parse_callback (byte status, word off, word len) {
   int seek_location = find_response( Ethernet::buffer + off, len);
   memcpy(&state, (Ethernet::buffer + off + seek_location), sizeof state);
-  Serial.print(F("State is now: ")); 
-  Serial.println(state);
-  printState(state);
+  char buf[18];
+  sprintf(buf, "State is "BYTETOBINARYPATTERN, BYTETOBINARY(state));
+  syslog(buf);
+ // Serial.print("State is now: " + String(buf)); 
+ // Serial.println(buf);
+ // Serial.println(state);
+ // printState(state);
   sync_leds();
 }
 
