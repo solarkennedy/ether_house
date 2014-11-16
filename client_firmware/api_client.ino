@@ -18,14 +18,18 @@ void get_target_mac() {
 }
 
 static void macs_parse_callback (byte status, word off, word len) {
-
   int seek_location = find_response(Ethernet::buffer + off, len);
-  memcpy(target_mac, (Ethernet::buffer + off + seek_location), sizeof target_mac); 
-  // Configure a callback for our target mac:
-  Serial.print(F("Enabling listener for MAC: "));
-  printMac(target_mac);
-  // While we still a connection, let it it wait for the syn/ack stuff
-  ether.snifferListenForMac(&packet_sniffer_callback, target_mac);
+  if (seek_location == -1) {
+    Serial.println(F("Got a non-ok response from target_mac"));
+  }   
+  else {
+    memcpy(target_mac, (Ethernet::buffer + off + seek_location), sizeof target_mac); 
+    // Configure a callback for our target mac:
+    Serial.print(F("Enabling listener for MAC: "));
+    printMac(target_mac);
+    // While we still a connection, let it it wait for the syn/ack stuff
+    ether.snifferListenForMac(&packet_sniffer_callback, target_mac);
+  }
   locked = false;
 }
 
@@ -34,10 +38,7 @@ void get_remote_state() {
     Serial.println(F("Remote state fetch aborted: locked by something else"));
     return;
   }
-  //Serial.println();
   syslog("Syncing State from Server.");
-  //Serial.print(F("State is currently:")); 
-  //Serial.println(state);
   ether.browseUrl(PSTR("/state?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, state_parse_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
   locked == true;
@@ -53,11 +54,16 @@ void get_remote_state() {
 
 void state_parse_callback (byte status, word off, word len) {
   int seek_location = find_response( Ethernet::buffer + off, len);
-  memcpy(&state, (Ethernet::buffer + off + seek_location), sizeof state);
-  char buf[25];
-  sprintf(buf, "Synced State is "BYTETOBINARYPATTERN, BYTETOBINARY(state));
-  syslog(buf);
-  sync_leds();
+  if (seek_location == -1) {
+    Serial.println(F("Got a non-ok response from state_parse"));
+  }   
+  else {
+    memcpy(&state, (Ethernet::buffer + off + seek_location), sizeof state);
+    char buf[25];
+    sprintf(buf, "Synced State is "BYTETOBINARYPATTERN, BYTETOBINARY(state));
+    syslog(buf);
+    sync_leds();
+  }
   locked = false;
 }
 
@@ -87,7 +93,6 @@ void api_set_on() {
     return;
   }
   syslog("Sending ON for my house: "MY_ID_CHAR);
-
   ether.browseUrl(PSTR("/on?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
   locked = true;
@@ -104,6 +109,9 @@ void api_set_on() {
 void api_set_callback (byte status, word off, word len) {
   Serial.println("Entering api_set_callback");
   int seek_location = find_response( Ethernet::buffer + off, len);
+  if (seek_location == -1) {
+    Serial.println(F("bad response from set_api_callback"));
+  }   
   locked = false;
 }
 
@@ -117,17 +125,38 @@ int find_response( byte* haystack, int length) {
   for (int i = 0; (i < length - needle_length); i++) {
     if (memcmp(needle, haystack + i, needle_length) == 0) {
       foundpos = i;
-      return foundpos + needle_length;
+      if (is_200(haystack, length)== true) {
+        return foundpos + needle_length;
+      } 
+      else {
+        return -1;
+      }
     }
   }
   return foundpos;
 }
 
+bool is_200(byte* haystack, int length) {
+  char needle[] = "200 OK";
+  int needle_length = sizeof needle - 1;
+  for (int i = 0; (i < length - needle_length); i++) {
+    if (memcmp(needle, haystack + i, needle_length) == 0) {
+      return true;
+    }
+  }
+  Serial.println(F("No 200 Found"));
+  return false;
+}
+
 void wait_for_tcp() {
   uint32_t timer = millis() + HTTP_TIMEOUT;
-    // While we still a connection, let it it wait for the syn/ack stuff
+  // While we still a connection, let it it wait for the syn/ack stuff
   while(millis() < timer){
     ether.packetLoop(ether.packetReceive());
   }
 }
+
+
+
+
 
