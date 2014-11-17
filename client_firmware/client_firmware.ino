@@ -57,6 +57,8 @@ void setup () {
   Serial.begin(115200);
   Serial.println(F("\nether_house"MY_ID_CHAR" starting network configuration"));
   setup_pins();
+  //TODO
+  //sync_state_from_eeprom()  //Way early pretend like everything is the same as before
 
   if (ether.begin(sizeof Ethernet::buffer, my_mac, CSPIN) == 0) {
     Serial.println(F("Failed to access Ethernet controller"));
