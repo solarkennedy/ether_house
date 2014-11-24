@@ -1,4 +1,4 @@
-## Etherhouse Client
+# Etherhouse Client
 
 Etherhouse a project of mine involving eight Christmas gifts.
 Each gift involved a display of some model houses made from folded
@@ -8,7 +8,7 @@ The houses light up, depending on whether that family member is
 home or not. Their presence is detected based on if their smartphone
 is on the same network the etherhouse is on.
 
-### Hardware
+## Hardware
 
 Etherhouse involves a few hardware components:
 
@@ -19,9 +19,47 @@ Etherhouse involves a few hardware components:
 
 See the schematic (TODO) for electrical stuff.
 
-### Software
+### Arduino + Ethernet
 
-The software includes two main components:
+The Arduino is a standard [Arduino Nano](http://arduino.cc/en/Main/arduinoBoardNano).
+
+The Arduino connects to a ENC28J60 module via SPI using the [ethercard](https://github.com/jcw/ethercard)
+library. I use modules with a built-in 3-5v converter so I can plug the two in directly.
+
+### Building Models
+
+One main component of the etherhouse project is the construction of the paper
+models. As much as possible I tried to mimic the actual house owned by the
+family member by using Bing/Google Maps arial photographs.
+
+Although my models are not shared, you can use the 
+[same tea-light 3d model](http://www.silhouettedesignstore.com/?page=view-shape&id=69143)
+ I used as a starting point. 
+
+I used the standard Silhouette software with a 
+[Silhouette Portrait](http://www.silhouetteamerica.com/shop/machines/portrait)
+to design, and cut the models. In reality, any cutting or CNC machine can do
+this, depending on how handy you are.
+
+### Leds
+
+To minimize components, I used a self-flickering yellow LED, sourced from Ebay.
+
+Two LEDs are wired in serial for each house.
+
+## Software
+
+This repo contains the actual code that runs on the Arduino. 
+This uses one external library and is in the native Arduino C++. This library
+is slightly modified in order to sniff packets from a selected MAC address.
+
+The Arduino runs a limited TCP/IP stack and interacts with the http api.
+
+The code plenty of defensive code in place to ensure the client continues to run
+without interruption or interaction. No one should need to "turn it off and on
+again."
+
+In summary:
 
 * Arduino firwmare (client)
 ** Listens for packets from the targets cell phone
