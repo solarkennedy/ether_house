@@ -63,6 +63,7 @@ void state_parse_callback (byte status, word off, word len) {
     sprintf(buf, "Synced State is "BYTETOBINARYPATTERN, BYTETOBINARY(state));
     syslog(buf);
     sync_leds();
+    saveStateToEeprom();
   }
   locked = false;
 }

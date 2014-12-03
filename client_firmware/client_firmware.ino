@@ -1,3 +1,4 @@
+#include <EEPROM.h>
 #include <EtherCard.h>
 #include <IPAddress.h>
 
@@ -30,6 +31,7 @@
   (byte & 0x04 ? 1 : 0), \
   (byte & 0x02 ? 1 : 0), \
   (byte & 0x01 ? 1 : 0) 
+#define STATE_ADDR 1
 
 const byte my_mac[] = { 
   0x74,0x69,0x69,0x2D,0x30,MY_ID };
@@ -57,8 +59,7 @@ void setup () {
   Serial.begin(115200);
   Serial.println(F("\nether_house"MY_ID_CHAR" starting network configuration"));
   setup_pins();
-  //TODO
-  //sync_state_from_eeprom()  //Way early pretend like everything is the same as before
+  readStateFromEeprom();
 
   if (ether.begin(sizeof Ethernet::buffer, my_mac, CSPIN) == 0) {
     Serial.println(F("Failed to access Ethernet controller"));
