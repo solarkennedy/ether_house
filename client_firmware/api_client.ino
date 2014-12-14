@@ -114,6 +114,7 @@ void api_set_callback (byte status, word off, word len) {
     Serial.println(F("bad response from set_api_callback"));
   }   
   locked = false;
+  Serial.println(F("Finished set api call OK."));
 }
 
 // find_response
