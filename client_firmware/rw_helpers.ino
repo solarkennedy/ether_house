@@ -12,4 +12,5 @@ void readStateFromEeprom() {
   cli();
   state = EEPROM.read(STATE_ADDR);
   sei();
+  sync_leds();
 }
