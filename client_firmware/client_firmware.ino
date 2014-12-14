@@ -15,6 +15,8 @@
 // A device is gone if we haven't heard from them in 15 minutes
 #define ABSENSE_TIMEOUT 30000
 //#define ABSENSE_TIMEOUT 900000
+// Reboot the entire thing every 24 hours for good measure.
+#define REBOOT_INTERVAL 86400000
 
 #define NUM_HOUSES 8
 #define MY_ID 0
@@ -47,7 +49,7 @@ byte target_ip[4] = {
   255, 255, 255, 255 };
 byte state = 0; //No houses on at first
 byte Ethernet::buffer[500];
-static long timer;
+
 static long pinger_timer;
 static long absense_timer;
 static long pingsweep_timer;
@@ -123,6 +125,11 @@ void loop () {
     get_remote_state();
   }
 
+  if (millis() > REBOOT_INTERVAL) {
+    syslog("Rebooting after 24 hours");
+    reboot();
+  }
+
 }
 
 void reboot() {
@@ -136,5 +143,3 @@ void reboot_after_delay() {
   delay(100000);
   reboot();
 }
-
-
