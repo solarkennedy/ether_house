@@ -7,14 +7,13 @@
 // Ping our target every 2 seconds
 #define PINGER_INTERVAL 2000
 // Ping everything every hour
-#define PINGSWEEP_INTERVAL 36000
+#define PINGSWEEP_INTERVAL 3600000
 // How often to check back to the server for sync updates
-#define SYNC_INTERVAL 36000
+#define SYNC_INTERVAL 300000
 // General timeout for API calls and such
 #define HTTP_TIMEOUT 10000
 // A device is gone if we haven't heard from them in 15 minutes
-#define ABSENSE_TIMEOUT 30000
-//#define ABSENSE_TIMEOUT 900000
+#define ABSENSE_TIMEOUT 900000
 // Reboot the entire thing every 24 hours for good measure.
 #define REBOOT_INTERVAL 86400000
 
