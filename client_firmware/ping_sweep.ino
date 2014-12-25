@@ -35,3 +35,11 @@ boolean is_ip_local(byte ip[4]) {
   return true;
 }
 
+// validate_dhcp checks to make sure that our dhcp lease is still valid
+// and initiates a reboot if not. This sometimes happens :(
+void validate_dhcp() {
+  if (is_ip_local(ether.myip) == false) {
+    syslog("Invalid dhcp");
+    reboot();
+  }
+}

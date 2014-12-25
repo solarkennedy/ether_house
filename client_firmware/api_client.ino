@@ -3,6 +3,7 @@ void get_target_mac() {
     Serial.println(F("Get_target_mac aborted: locked by something else"));
     return;
   }
+  validate_dhcp();
   syslog("Retrieving target MAC address from server...");
   ether.browseUrl(PSTR("/target_mac?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "" , api_server, macs_parse_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
@@ -38,6 +39,7 @@ void get_remote_state() {
     Serial.println(F("Remote state fetch aborted: locked by something else"));
     return;
   }
+  validate_dhcp();
   syslog("Syncing State from Server.");
   ether.browseUrl(PSTR("/state?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, state_parse_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
@@ -73,8 +75,8 @@ void api_set_off() {
     Serial.println(F("API set off aborted: locked by something else"));
     return;
   }
+  validate_dhcp();
   syslog("Sending OFF for my house: "MY_ID_CHAR);
-
   ether.browseUrl(PSTR("/off?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
   locked = true;
@@ -93,6 +95,7 @@ void api_set_on() {
     Serial.println(F("API set on aborted: locked by something else"));
     return;
   }
+  validate_dhcp();
   syslog("Sending ON for my house: "MY_ID_CHAR);
   ether.browseUrl(PSTR("/on?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
