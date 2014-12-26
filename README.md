@@ -43,7 +43,7 @@ I used the standard Silhouette software with a
 to design, and cut the models. In reality, any cutting or CNC machine can do
 this, depending on how handy you are.
 
-See [Models.md](https://github.com/solarkennedy/ether_house/tree/master/house_models/Models.md)
+See [house_models/README.md](https://github.com/solarkennedy/ether_house/tree/master/house_models/README.md)
 for more instructions and pictures.
 
 ### Leds
