@@ -60,20 +60,23 @@ is slightly modified in order to sniff packets from a selected MAC address.
 
 The Arduino runs a limited TCP/IP stack and interacts with the http api.
 
-The code plenty of defensive code in place to ensure the client continues to run
-without interruption or interaction. No one should need to "turn it off and on
-again."
+The code is writen with basic error detection and reboot capabilities, to ensure
+the client continues to run without interruption or interaction. No one should
+need to "turn it off and on again."
 
 In summary:
 
 * Arduino firwmare (client)
-** Listens for packets from the targets cell phone
-** Updates the server when the target comes home or leaves
-** Periodically polls the server for state updates
+  * Queries the server for configruation (target mac address)
+  * Listens for packets from the targets cell phone
+  * Updates the server when the target comes home or leaves
+  * Periodically polls the server for state updates
+  * Saves state in EEPROM
 * [ether\_housed](https://github.com/solarkennedy/ether_housed) running on the internet (server)
-** In charge of house => mac\_address mapping
-** Store global state of who is home or not
-** Does API key auth
+  * In charge of house => mac\_address mapping
+  * Store global state of who is home or not
+  * Does API key auth
+  * Stores state of when each house last checked in
 
 ### Howto
 
