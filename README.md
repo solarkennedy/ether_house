@@ -1,5 +1,9 @@
-# Etherhouse Client
+# Etherhouse
 
+Video:<br>
+[![ether_house youtube demo](https://i.ytimg.com/vi/jgjrnxz6gm8/0.jpg)](https://www.youtube.com/watch?v=jgjrnxz6gm8)
+
+Final Product:<br>
 ![ether_houses](https://raw.githubusercontent.com/solarkennedy/ether_house/master/house_models/Frame/final_display.jpg)
 
 Etherhouse a project of mine involving eight Christmas gifts.
