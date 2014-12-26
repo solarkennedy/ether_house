@@ -1,5 +1,7 @@
 # Etherhouse Client
 
+![ether_houses](https://raw.githubusercontent.com/solarkennedy/ether_house/master/house_models/Frame/final_display.jpg)
+
 Etherhouse a project of mine involving eight Christmas gifts.
 Each gift involved a display of some model houses made from folded
 paper, each representing the home of a friend or family member.
@@ -32,14 +34,17 @@ One main component of the etherhouse project is the construction of the paper
 models. As much as possible I tried to mimic the actual house owned by the
 family member by using Bing/Google Maps arial photographs.
 
-Although my models are not shared, you can use the 
+You can buy the
 [same tea-light 3d model](http://www.silhouettedesignstore.com/?page=view-shape&id=69143)
- I used as a starting point. 
+ I used as a starting point if you want. 
 
 I used the standard Silhouette software with a 
 [Silhouette Portrait](http://www.silhouetteamerica.com/shop/machines/portrait)
 to design, and cut the models. In reality, any cutting or CNC machine can do
 this, depending on how handy you are.
+
+See [Models.md](https://github.com/solarkennedy/ether_house/tree/master/house_models/Models.md)
+for more instructions and pictures.
 
 ### Leds
 
