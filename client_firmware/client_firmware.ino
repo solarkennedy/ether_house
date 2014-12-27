@@ -1,6 +1,7 @@
 #include <EEPROM.h>
 #include <EtherCard.h>
 #include <IPAddress.h>
+#include <avr/wdt.h>
 
 #define CSPIN 10
 // NOTE: All of these timers are in Milliseconds!
@@ -10,8 +11,8 @@
 #define PINGSWEEP_INTERVAL 3600000
 // How often to check back to the server for sync updates
 #define SYNC_INTERVAL 300000
-// General timeout for API calls and such
-#define HTTP_TIMEOUT 10000
+// General timeout for API calls and such. Needs to be lower than the 8S watchdog!
+#define HTTP_TIMEOUT 5000
 // A device is gone if we haven't heard from them in 15 minutes
 #define ABSENSE_TIMEOUT 900000
 // Reboot the entire thing every 24 hours for good measure.
@@ -58,6 +59,7 @@ volatile bool locked = false;
 
 void setup () {
   Serial.begin(115200);
+  enable_watchdog();
   Serial.println(F("\nether_house"MY_ID_CHAR" starting network configuration"));
   setup_pins();
   readStateFromEeprom();
@@ -80,7 +82,9 @@ void setup () {
   syslog("etherhouse"MY_ID_CHAR" booted!");
 
   get_target_mac();
+  wdt_reset();
   get_remote_state(); 
+  wdt_reset();
 
   Serial.println(F("Finished initial configuration"));
   Serial.println(F("Now entering main loop"));
@@ -97,8 +101,10 @@ void setup () {
 }
 
 void loop () {
+  wdt_reset();
   // Normal loop of getting packets if they are available
   ether.customPacketLoop(ether.packetReceive());
+  wdt_reset();
 
   // Ping our target to see if they are alive
   if (millis() > pinger_timer + PINGER_INTERVAL) {
@@ -129,16 +135,8 @@ void loop () {
     reboot();
   }
 
+  wdt_reset();
 }
 
-void reboot() {
-  syslog("Rebooting now.");
-  delay(100);
-  asm volatile ("  jmp 0");  
-}
 
-void reboot_after_delay() {
-  syslog("Delayed reboot initiated.");
-  delay(100000);
-  reboot();
-}
+
