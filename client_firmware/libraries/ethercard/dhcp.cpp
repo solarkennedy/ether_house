@@ -12,7 +12,7 @@
 // Copyright: GPL V2
 // See http://www.gnu.org/licenses/gpl.html
 
-//#define DHCPDEBUG
+#define DHCPDEBUG
 
 #include "EtherCard.h"
 #include "net.h"

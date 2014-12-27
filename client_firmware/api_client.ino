@@ -44,7 +44,7 @@ void get_remote_state() {
   syslog("Syncing State from Server.");
   ether.browseUrl(PSTR("/state?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, state_parse_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
-  locked == true;
+  locked = true;
   while (locked == true) {
     ether.packetLoop(ether.packetReceive());
     if (millis() > timer) {
@@ -155,9 +155,11 @@ bool is_200(byte* haystack, int length) {
 }
 
 void wait_for_tcp() {
+  wdt_reset();
   uint32_t timer = millis() + HTTP_TIMEOUT;
   // While we still a connection, let it it wait for the syn/ack stuff
   while(millis() < timer){
     ether.packetLoop(ether.packetReceive());
   }
+  wdt_reset();
 }

@@ -64,14 +64,19 @@ void setup () {
   setup_pins();
   readStateFromEeprom();
 
+  wdt_reset();
   if (ether.begin(sizeof Ethernet::buffer, my_mac, CSPIN) == 0) {
     Serial.println(F("Failed to access Ethernet controller"));
-    reboot_after_delay();
+    reboot();
   }
+
+  wdt_reset();
   if (!ether.dhcpSetup()) {
     syslog("DHCP failed");
-    reboot_after_delay();
+    reboot();
   }
+
+  wdt_reset();
   if (!ether.dnsLookup(api_server)) {
     syslog("DNS failed");
     reboot_after_delay();
@@ -81,13 +86,14 @@ void setup () {
 
   syslog("etherhouse"MY_ID_CHAR" booted!");
 
+  wdt_reset();
   get_target_mac();
   wdt_reset();
   get_remote_state(); 
   wdt_reset();
 
   Serial.println(F("Finished initial configuration"));
-  Serial.println(F("Now entering main loop"));
+  Serial.println(F("Now entering main loop\n"));
 
   // Setup timers
   pinger_timer = millis() - PINGER_INTERVAL ; 
@@ -135,8 +141,5 @@ void loop () {
     reboot();
   }
 
-  wdt_reset();
 }
-
-
 

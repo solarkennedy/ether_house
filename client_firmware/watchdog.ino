@@ -4,15 +4,14 @@ void reboot() {
   asm volatile ("  jmp 0");  
 }
 
-void watchdog_reboot() {
-  Serial.println("Watchdog initiated reboot...");
-  delay(100);
-  asm volatile ("  jmp 0");  
-}
-
 void reboot_after_delay() {
   syslog("Delayed reboot initiated.");
-  delay(100000);
+  wdt_reset();
+  delay(7000);
+  wdt_reset();
+  delay(7000);
+  wdt_reset();
+  delay(7000);
   reboot();
 }
 
@@ -33,5 +32,5 @@ ISR(WDT_vect) {
   // On the plus side we end up skipping the bootloader wait?
   MCUSR = 0; //reset the status register of the MCU  
   wdt_disable(); //disable the watchdog
-  watchdog_reboot();
+  asm volatile ("  jmp 0");  
 }
