@@ -40,6 +40,7 @@ void get_remote_state() {
     return;
   }
   validate_dhcp();
+  Serial.println();
   syslog("Syncing State from Server.");
   ether.browseUrl(PSTR("/state?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, state_parse_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
@@ -160,8 +161,3 @@ void wait_for_tcp() {
     ether.packetLoop(ether.packetReceive());
   }
 }
-
-
-
-
-
