@@ -19,7 +19,9 @@ void ping_sweep() {
     ether.clientIcmpRequest(ip);
     // But we must use our customPacketLoop in order to properly intercept
     // Sniffed packets as they come back!
+    delay(2);
     ether.customPacketLoop(ether.packetReceive());
+    delay(2);
   }
   Serial.println("done.");
 }

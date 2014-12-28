@@ -121,8 +121,15 @@ void loop () {
   // If we haven't heard from our device, time to time out and turn off
   // The sniffer callback resets the absense_timer
   if ((bitRead(state, MY_ID) == true) && (millis() > absense_timer + ABSENSE_TIMEOUT)) {
-    syslog("Absense timeout of target. Turning off light "MY_ID_CHAR);
-    turn_my_house_off();
+    // At the last second, let's try a last-ditch ping sweep.
+    pingsweep_timer = millis();
+    ping_sweep();
+    wdt_reset();
+    // Then if we are *still* here
+    if ((bitRead(state, MY_ID) == true) && (millis() > absense_timer + ABSENSE_TIMEOUT)) {
+      syslog("Absense timeout of target. Turning off light "MY_ID_CHAR);
+      turn_my_house_off();
+    }
   }
 
   // After a long time we ping everything in case we don't even know what ip our device has
@@ -142,4 +149,3 @@ void loop () {
   }
 
 }
-
