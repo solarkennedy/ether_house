@@ -7,8 +7,10 @@
 // NOTE: All of these timers are in Milliseconds!
 // Ping our target every 60 seconds
 #define PINGER_INTERVAL 60000
+// If target IP isn't known, ping sweep this often
+#define PINGSWEEP_INTERVAL_FIND_TARGET 60000
 // Ping everything every hour
-#define PINGSWEEP_INTERVAL 3600000
+#define PINGSWEEP_INTERVAL_RESCAN 3600000
 // How often to check back to the server for sync updates
 #define SYNC_INTERVAL 300000
 // General timeout for API calls and such. Needs to be lower than the 8s watchdog!
@@ -102,13 +104,15 @@ void setup () {
   // Start the absense timer with the total grace period to give it the benifit of the doubt
   absense_timer = millis();
   // We can start the ping sweep on bootup.
-  pingsweep_timer = millis() - PINGSWEEP_INTERVAL;
+  pingsweep_timer = millis() - PINGSWEEP_INTERVAL_FIND_TARGET;
   // We already got the state from above. Setup the next issue.
   sync_timer = millis();
 
 }
 
 void loop () {
+  long pingsweep_interval;
+
   wdt_reset();
   // Normal loop of getting packets if they are available
   ether.packetLoop(ether.packetReceive());
@@ -137,8 +141,13 @@ void loop () {
     }
   }
 
+  // If we don't yet know the target_ip, ping sweep fairly often to find it. Otherwise:
   // After a long time we ping everything in case we don't even know what ip our device has
-  if (millis() > pingsweep_timer + PINGSWEEP_INTERVAL) {
+  if (!memcmp(target_ip, allOnes, sizeof target_ip))
+    pingsweep_interval = PINGSWEEP_INTERVAL_FIND_TARGET;
+  else
+    pingsweep_interval = PINGSWEEP_INTERVAL_RESCAN;
+  if (millis() > pingsweep_timer + pingsweep_interval) {
     pingsweep_timer = millis();
     ping_sweep();
   }
