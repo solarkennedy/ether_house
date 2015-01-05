@@ -1,5 +1,4 @@
-
-void printMac(uint8_t macaddr[6]) {
+void printMac(const uint8_t *macaddr) {
   Serial.print(macaddr[0], HEX);
   int i;
   char tmp[16];

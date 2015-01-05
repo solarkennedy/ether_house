@@ -25,7 +25,7 @@ static uint8_t check_mac_message_is_from(const uint8_t *mac) {
     return memcmp(gPB + ETH_SRC_MAC, mac, 6) == 0;
 }
 
-void EtherCard::snifferListenForMac(SnifferCallback callback, uint8_t srcmacaddr[6]) {
+void EtherCard::snifferListenForMac(SnifferCallback callback, const uint8_t *srcmacaddr) {
     if(numSniffers < SNIFFER_MAXLISTENERS)
     {
         sniffers[numSniffers] = (snifferListener){callback, *srcmacaddr };

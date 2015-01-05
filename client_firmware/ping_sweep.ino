@@ -34,7 +34,7 @@ void ping_target() {
 }
 
 // Filter to only look at packets that are coming from a legit ip.
-boolean is_ip_local(byte ip[4]) {
+boolean is_ip_local(const uint8_t *ip) {
   if (memcmp(ip, allOnes, 4) == 0 || memcmp(ip, allZeros, 4) == 0 ) {
     return false;
   }

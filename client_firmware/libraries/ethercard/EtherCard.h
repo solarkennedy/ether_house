@@ -47,8 +47,8 @@ typedef void (*UdpServerCallback)(
 
 /** This type definition defines the structure of a sniffe/ event handler callback funtion */
 typedef void (*SnifferCallback)(
-    uint8_t srcmacaddr[6], // Source mac address
-    uint8_t src_ip[4],    ///< IP address of the sender
+    const uint8_t *srcmacaddr, // Source mac address
+    const uint8_t *src_ip,    ///< IP address of the sender
     const char *data,   ///< UDP payload data
     uint16_t len);        ///< Length of the payload data
 
@@ -449,19 +449,19 @@ public:
     */
     static void udpServerListenOnPort(UdpServerCallback callback, uint16_t port);
 
-    static void snifferListenForMac(SnifferCallback callback, uint8_t srcmacaddr[6]);
+    static void snifferListenForMac(SnifferCallback callback, const uint8_t *srcmacaddr);
 
     /**   @brief  Pause listing on UDP port
     *     @brief  port Port to pause
     */
     static void udpServerPauseListenOnPort(uint16_t port);
-    static void snifferPauseListenForMac(uint8_t srcmacaddr[6]);
+    static void snifferPauseListenForMac(const uint8_t *srcmacaddr);
 
     /**   @brief  Resume listing on UDP port
     *     @brief  port Port to pause
     */
     static void udpServerResumeListenOnPort(uint16_t port);
-    static void snifferResumeListenForMac(uint8_t srcmacaddr[6]);
+    static void snifferResumeListenForMac(const uint8_t *srcmacaddr);
 
     /**   @brief  Check if UDP server is listening on any ports
     *     @return <i>bool</i> True if listening on any ports
