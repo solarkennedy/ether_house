@@ -840,6 +840,9 @@ uint16_t EtherCard::customPacketLoop (uint16_t plen) {
 		return 0;
     }
 	
+    // Hook in here and sniff all the packets?
+    ether.snifferProcessPacket(plen);
+
     if (eth_type_is_arp_and_my_ip(plen))
     {   //Service ARP request
         if (gPB[ETH_ARP_OPCODE_L_P]==ETH_ARP_OPCODE_REQ_L_V)
@@ -856,8 +859,7 @@ uint16_t EtherCard::customPacketLoop (uint16_t plen) {
 		}
         return 0;
     }
-    // Hook in here and sniff all the packets?
-    ether.snifferProcessPacket(plen);
+
     if (eth_type_is_ip_and_my_ip(plen)==0)
     {   //Not IP so ignoring
         //!@todo Add other protocols (and make each optional at compile time)
