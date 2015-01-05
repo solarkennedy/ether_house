@@ -317,12 +317,12 @@ public:
     static void updateBroadcastAddress();
 
     /**   @brief  Check if got gateway hardware address (ARP lookup)
-    *     @return <i>uint8_t</i> True if gateway found
+    *     @return <i>uint8_t</i> True if waiting for gateway
     */
     static uint8_t clientWaitingGw ();
 
     /**   @brief  Check if got gateway DNS address (ARP lookup)
-    *     @return <i>uint8_t</i> True if DNS found
+    *     @return <i>uint8_t</i> True if waiting for DNS
     */
     static uint8_t clientWaitingDns ();
 
