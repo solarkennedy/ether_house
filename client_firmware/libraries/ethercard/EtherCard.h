@@ -323,6 +323,19 @@ public:
     */
     static uint8_t clientWaitingDns ();
 
+    /**   @brief  Select the destination IP to communicat with, and ARP it if required
+    */
+    static void selectAndArpDestAddr (const uint8_t *destip, uint16_t timeout);
+
+    /**   @brief  Select the destination MAC to communicate with
+    */
+    static void forceDestMac (const uint8_t *destmac);
+
+    /**   @brief  Check if got MAC address to communicate with selected dest IP
+    *     @return <i>uint8_t</i> True if waiting for dest MAC address
+    */
+    static uint8_t clientWaitingDestAddr ();
+
     /**   @brief  Prepare a TCP request
     *     @param  result_cb Pointer to callback function that handles TCP result
     *     @param  datafill_cb Pointer to callback function that handles TCP data payload

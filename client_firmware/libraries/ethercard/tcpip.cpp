@@ -451,6 +451,40 @@ uint8_t EtherCard::clientWaitingDns () {
     return !(waitgwmac & WGW_HAVE_GW_MAC);
 }
 
+uint8_t EtherCard::clientWaitingDestAddr () {
+    return !has_dest_mac;
+}
+
+/* For LAN IPs, set hisip, and wait for ARP response */
+void EtherCard::selectAndArpDestAddr(const uint8_t *destip, uint16_t timeout) {
+    uint8_t (*wait_func)(void);
+    unsigned long start = millis();
+
+    // Local vs remote/gateway'd IP?
+    if(is_lan(myip, destip)) {
+        if (memcmp(hisip, destip, sizeof hisip)) {
+            memcpy(hisip, destip, sizeof hisip);
+            has_dest_mac = false;
+            waiting_for_dest_mac = false;
+        }
+        wait_func = clientWaitingDestAddr;
+    } else {
+        wait_func = clientWaitingGw;
+    }
+
+    while ((millis() - start) < timeout) {
+        if (!wait_func())
+            return;
+        packetLoop(packetReceive());
+    }
+}
+
+void EtherCard::forceDestMac(const uint8_t *destmac) {
+    EtherCard::copyMac(destmacaddr, destmac);
+    has_dest_mac = true;
+    waiting_for_dest_mac = false;
+}
+
 static uint8_t client_store_mac(uint8_t *source_ip, uint8_t *mac) {
 	if (memcmp(gPB + ETH_ARP_SRC_IP_P, source_ip, 4) != 0)
         return 0;
