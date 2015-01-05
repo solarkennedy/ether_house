@@ -1,5 +1,5 @@
 //callback that prints received packets to the serial port
-void packet_sniffer_callback(const uint8_t *src_mac, const uint8_t *src_ip, const char *data, word len) {
+void packet_sniffer_callback(const uint8_t *src_mac, const uint8_t *src_ip) {
   // If we got a packet, we need to reset the absense_timer so it can start counting down again
   // even if the packet isn't IP
   absense_timer = millis();

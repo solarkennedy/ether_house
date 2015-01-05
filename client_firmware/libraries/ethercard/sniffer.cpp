@@ -45,15 +45,7 @@ bool EtherCard::snifferProcessPacket(uint16_t plen) {
     for(int i = 0; i < numSniffers; i++)
     {
         if(check_mac_message_is_from(sniffers[i].srcmacaddr))
-        {
-            uint16_t datalen = (uint16_t) (gPB[UDP_LEN_H_P] << 8)  + gPB[UDP_LEN_L_P] - UDP_HEADER_LEN;
-            sniffers[i].callback(
-                gPB + ETH_SRC_MAC,
-                gPB + IP_SRC_P,
-                (const char *) (gPB + UDP_DATA_P),
-                datalen
-                );
-        }
+            sniffers[i].callback(gPB + ETH_SRC_MAC, gPB + IP_SRC_P);
     }
     return true;
 }

@@ -48,9 +48,7 @@ typedef void (*UdpServerCallback)(
 /** This type definition defines the structure of a sniffe/ event handler callback funtion */
 typedef void (*SnifferCallback)(
     const uint8_t *src_mac, ///< Source mac address
-    const uint8_t *src_ip,  ///< IP address of the sender
-    const char *data,   ///< UDP payload data
-    uint16_t len);        ///< Length of the payload data
+    const uint8_t *src_ip); ///< IP address of the sender
 
 /** This type definition defines the structure of a DHCP Option callback funtion */
 typedef void (*DhcpOptionCallback)(
