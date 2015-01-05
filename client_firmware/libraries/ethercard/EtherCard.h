@@ -470,7 +470,7 @@ public:
     *     @return <i>bool</i> True if packet processed
     */
     static bool udpServerHasProcessedPacket(uint16_t len);    //called by tcpip, in packetLoop
-    static bool snifferProcessPacket(uint16_t len);    //called by tcpip, in packetLoop
+    static void snifferProcessPacket(uint16_t len);    //called by tcpip, in packetLoop
 
     // dhcp.cpp
     /**   @brief  Update DHCP state
