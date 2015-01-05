@@ -4,8 +4,8 @@ void printMac(uint8_t macaddr[6]) {
   int i;
   char tmp[16];
   for (i=1; i<6; i++) {
-    sprintf(tmp, "%.2X",macaddr[i]); 
-    Serial.print(':'); 
+    sprintf(tmp, "%.2X",macaddr[i]);
+    Serial.print(':');
     Serial.print(tmp);
   }
   Serial.println();
@@ -15,10 +15,10 @@ void printState(byte the_state) {
   Serial.println("Current state:");
   for (int i=NUM_HOUSES-1; i>=0; i--) {
     boolean onoroff = (state >> i) & 1;
-    Serial.print(F("House ")); 
-    Serial.print(i); 
-    Serial.print(F(": ")); 
-    Serial.println(onoroff); 
+    Serial.print(F("House "));
+    Serial.print(i);
+    Serial.print(F(": "));
+    Serial.println(onoroff);
   }
 }
 

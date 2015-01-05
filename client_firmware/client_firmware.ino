@@ -11,7 +11,7 @@
 #define PINGSWEEP_INTERVAL 3600000
 // How often to check back to the server for sync updates
 #define SYNC_INTERVAL 300000
-// General timeout for API calls and such. Needs to be lower than the 8S watchdog!
+// General timeout for API calls and such. Needs to be lower than the 8s watchdog!
 #define HTTP_TIMEOUT 5000
 // A device is gone if we haven't heard from them in 15 minutes
 #define ABSENSE_TIMEOUT 900000
@@ -32,20 +32,20 @@
   (byte & 0x08 ? 1 : 0), \
   (byte & 0x04 ? 1 : 0), \
   (byte & 0x02 ? 1 : 0), \
-  (byte & 0x01 ? 1 : 0) 
+  (byte & 0x01 ? 1 : 0)
 #define STATE_ADDR 1
 
-const byte my_mac[] = { 
+const byte my_mac[] = {
   0x74,0x69,0x69,0x2D,0x30,MY_ID };
-const byte allZeros[] = { 
+const byte allZeros[] = {
   0x00, 0x00, 0x00, 0x00 };
-const byte allOnes[] = { 
+const byte allOnes[] = {
   0xFF, 0xFF, 0xFF, 0xFF };
 const char api_server[] PROGMEM = "etherhouse.xkyle.com";
 
-uint8_t target_mac[6] = {   
+uint8_t target_mac[6] = {
   -1,-1,-1,-1,-1,-1 };
-byte target_ip[4] = { 
+byte target_ip[4] = {
   255, 255, 255, 255 };
 byte state = 0; //No houses on at first
 byte Ethernet::buffer[500];
@@ -89,14 +89,14 @@ void setup () {
   wdt_reset();
   get_target_mac();
   wdt_reset();
-  get_remote_state(); 
+  get_remote_state();
   wdt_reset();
 
   Serial.println(F("Finished initial configuration"));
   Serial.println(F("Now entering main loop\n"));
 
   // Setup timers
-  pinger_timer = millis() - PINGER_INTERVAL ; 
+  pinger_timer = millis() - PINGER_INTERVAL ;
   // Start the absense timer with the total grace period to give it the benifit of the doubt
   absense_timer = millis();
   // We can start the ping sweep on bootup.
@@ -147,5 +147,4 @@ void loop () {
     syslog("Rebooting after 24 hours");
     reboot();
   }
-
 }

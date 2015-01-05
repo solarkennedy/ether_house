@@ -1,12 +1,12 @@
 void ping_sweep() {
-  // Assumes class C. 
+  // Assumes class C.
   // TODO: Be smarter about the range
   uint8_t ip[4];
   ip[0] = ether.myip[0];
   ip[1] = ether.myip[1];
   ip[2] = ether.myip[2];
   syslog("Starting Ping Sweep");
-  Serial.print("\nPinging the ");
+  Serial.print("Pinging the ");
   Serial.print(ip[0]);
   Serial.print(".");
   Serial.print(ip[1]);
@@ -14,7 +14,7 @@ void ping_sweep() {
   Serial.print(ip[2]);
   Serial.print(".0/24 subnet...");
   for (int i = 1; i < 255; i++) {
-    ip[3] = i; 
+    ip[3] = i;
     // Don't care about replies, just want a ping sweep.
     ether.clientIcmpRequest(ip);
     // But we must use our customPacketLoop in order to properly intercept

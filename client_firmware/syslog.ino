@@ -1,6 +1,6 @@
 // Sends syslog packet to the broadcast address and prints to stdout
 // Probably not RFC5424 compliant...
-void syslog(const char* logstring) {
+void syslog(const char *logstring) {
   Serial.println(logstring);
   String packet;
   // News + INFO?
