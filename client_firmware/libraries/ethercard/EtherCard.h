@@ -280,7 +280,6 @@ public:
     *     @note   Only handles ARP and IP
     */
     static uint16_t packetLoop (uint16_t plen);
-    static uint16_t customPacketLoop (uint16_t plen);
 
     /**   @brief  Accept a TCP/IP connection
     *     @param  port IP port to accept on - do nothing if wrong port

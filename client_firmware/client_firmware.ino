@@ -109,7 +109,7 @@ void setup () {
 void loop () {
   wdt_reset();
   // Normal loop of getting packets if they are available
-  ether.customPacketLoop(ether.packetReceive());
+  ether.packetLoop(ether.packetReceive());
   wdt_reset();
 
   // Ping our target to see if they are alive
