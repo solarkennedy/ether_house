@@ -455,13 +455,11 @@ public:
     *     @brief  port Port to pause
     */
     static void udpServerPauseListenOnPort(uint16_t port);
-    static void snifferPauseListenForMac(const uint8_t *srcmacaddr);
 
     /**   @brief  Resume listing on UDP port
     *     @brief  port Port to pause
     */
     static void udpServerResumeListenOnPort(uint16_t port);
-    static void snifferResumeListenForMac(const uint8_t *srcmacaddr);
 
     /**   @brief  Check if UDP server is listening on any ports
     *     @return <i>bool</i> True if listening on any ports
