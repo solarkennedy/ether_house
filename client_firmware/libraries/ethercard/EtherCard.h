@@ -317,12 +317,12 @@ public:
     static void updateBroadcastAddress();
 
     /**   @brief  Check if got gateway hardware address (ARP lookup)
-    *     @return <i>unit8_t</i> True if gateway found
+    *     @return <i>uint8_t</i> True if gateway found
     */
     static uint8_t clientWaitingGw ();
 
     /**   @brief  Check if got gateway DNS address (ARP lookup)
-    *     @return <i>unit8_t</i> True if DNS found
+    *     @return <i>uint8_t</i> True if DNS found
     */
     static uint8_t clientWaitingDns ();
 
@@ -330,7 +330,7 @@ public:
     *     @param  result_cb Pointer to callback function that handles TCP result
     *     @param  datafill_cb Pointer to callback function that handles TCP data payload
     *     @param  port Remote TCP/IP port to connect to
-    *     @return <i>unit8_t</i> ID of TCP/IP session (0-7)
+    *     @return <i>uint8_t</i> ID of TCP/IP session (0-7)
     *     @note   Return value provides id of the request to allow up to 7 concurrent requests
     */
     static uint8_t clientTcpReq (uint8_t (*result_cb)(uint8_t,uint8_t,uint16_t,uint16_t),
@@ -559,7 +559,7 @@ public:
     *     @param  strbuf Pointer to buffer to hold null terminated result string
     *     @param  maxlen Maximum length of result
     *     @param  key Pointer to null terminated string holding the key to search for
-    *     @return <i>unit_t</i> Length of the value. 0 if not found
+    *     @return <i>uint8_t</i> Length of the value. 0 if not found
     *     @note   Ensure strbuf has memory allocated of at least maxlen + 1 (to accomodate result plus terminating null)
     */
     static uint8_t findKeyVal(const char *str,char *strbuf,
