@@ -25,9 +25,9 @@ void toggle_house(int house, boolean value) {
     sync_leds();
     // If we are toggling our house, then we need to let the server
     // know that our state changed.
-    if (house == MY_ID && value == true)
+    if (house == MY_ID && value)
       api_set_on();
-    else if (house == MY_ID && value == false)
+    else if (house == MY_ID && !value)
       api_set_off();
   }
 }

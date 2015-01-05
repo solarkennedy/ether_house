@@ -27,7 +27,7 @@ void ping_sweep() {
 }
 void ping_target() {
   // Don't bother trying to ping anything that isn't local to the lan.
-  if (is_ip_local(target_ip) == true) {
+  if (is_ip_local(target_ip)) {
     //ether.printIp("Pinging target ip: ", target_ip);
     ether.clientIcmpRequest(target_ip);
   }
@@ -49,7 +49,7 @@ boolean is_ip_local(byte ip[4]) {
 // validate_dhcp checks to make sure that our dhcp lease is still valid
 // and initiates a reboot if not. This sometimes happens :(
 void validate_dhcp() {
-  if (is_ip_local(ether.myip) == false) {
+  if (!is_ip_local(ether.myip)) {
     syslog("Invalid dhcp");
     reboot();
   }

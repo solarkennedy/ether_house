@@ -8,7 +8,7 @@ void packet_sniffer_callback(uint8_t srcmacaddr[6], byte ip[4], const char *data
 
   // Only copy the ip as a target if it is local.
   // Everything else is bogus.
-  if (is_ip_local(ip) == true) {
+  if (is_ip_local(ip)) {
     // Only print an store if the sniffed ip is new
     if (memcmp(ip, target_ip, 4) != 0){
       Serial.print(F("\nGot sniffed local ip packet. Storing target: "));
