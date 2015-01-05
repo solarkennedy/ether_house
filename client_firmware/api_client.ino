@@ -5,6 +5,7 @@ void get_target_mac() {
   }
   validate_dhcp();
   syslog("Retrieving target MAC address from server...");
+  memcpy(ether.hisip, api_ip, sizeof ether.hisip);
   ether.browseUrl(PSTR("/target_mac?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "" , api_server, macs_parse_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
   locked = true;
@@ -42,6 +43,7 @@ void get_remote_state() {
   validate_dhcp();
   Serial.println();
   syslog("Syncing State from Server.");
+  memcpy(ether.hisip, api_ip, sizeof ether.hisip);
   ether.browseUrl(PSTR("/state?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, state_parse_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
   locked = true;
@@ -78,6 +80,7 @@ void api_set_off() {
   }
   validate_dhcp();
   syslog("Sending OFF for my house: "MY_ID_CHAR);
+  memcpy(ether.hisip, api_ip, sizeof ether.hisip);
   ether.browseUrl(PSTR("/off?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
   locked = true;
@@ -98,6 +101,7 @@ void api_set_on() {
   }
   validate_dhcp();
   syslog("Sending ON for my house: "MY_ID_CHAR);
+  memcpy(ether.hisip, api_ip, sizeof ether.hisip);
   ether.browseUrl(PSTR("/on?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
   locked = true;

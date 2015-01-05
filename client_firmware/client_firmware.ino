@@ -47,6 +47,7 @@ uint8_t target_mac[6] = {
   -1,-1,-1,-1,-1,-1 };
 uint8_t target_ip[4] = {
   255, 255, 255, 255 };
+uint8_t api_ip[4];
 uint8_t state = 0; //No houses on at first
 uint8_t Ethernet::buffer[500];
 
@@ -81,6 +82,7 @@ void setup () {
     syslog("DNS failed");
     reboot_after_delay();
   }
+  memcpy(api_ip, ether.hisip, sizeof api_ip);
 
   print_netcfg();
 
