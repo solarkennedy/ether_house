@@ -28,11 +28,8 @@ static uint8_t check_mac_message_is_from(const uint8_t *mac) {
 void EtherCard::snifferListenForMac(SnifferCallback callback, const uint8_t *srcmacaddr) {
     if(numSniffers < SNIFFER_MAXLISTENERS)
     {
-        sniffers[numSniffers] = (snifferListener){callback, *srcmacaddr };
-        // I don't really know what I'm doing. Pointers?
-        for ( int i=1; i<6; i++) {
-            sniffers[numSniffers].srcmacaddr[i] = srcmacaddr[i];
-        }
+        sniffers[numSniffers].callback = callback;
+        memcpy(sniffers[numSniffers].srcmacaddr, srcmacaddr, sizeof sniffers[numSniffers].srcmacaddr);
         numSniffers++;
     }
 }
