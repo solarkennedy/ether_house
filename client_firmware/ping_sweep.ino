@@ -16,9 +16,10 @@ void ping_sweep() {
   for (int i = 1; i < 255; i++) {
     ip[3] = i;
     // Don't care about replies, just want a ping sweep.
-    ether.clientIcmpRequest(ip);
-    delay(2);
-    ether.packetLoop(ether.packetReceive());
+    // If ARP succeeded, we processed the ARP response in the sniffer,
+    // so we saw/tested the MAC, so there's no need to ICMP ping.
+    // If ARP didn't succeed, we can't ICMP ping, since we don't know the MAC
+    ether.selectAndArpDestAddr(ip, 5);
     delay(2);
   }
   Serial.println("done.");
@@ -27,6 +28,20 @@ void ping_target() {
   // Don't bother trying to ping anything that isn't local to the lan.
   if (is_ip_local(target_ip)) {
     //ether.printIp("Pinging target ip: ", target_ip);
+    // We must ICMP ping here, since some (at least Android) systems don't
+    // respond to ARP when asleep, but an ICMP pings wakes them up to respond.
+    // This is probably due to buggy TCP offload processors. See e.g.
+    // https://code.google.com/p/android/issues/detail?id=42272
+    //
+    // Of course, if we've communicated with some other destination in the
+    // mean time, the stored destination MAC address has probably been
+    // over-written with the API server or ping sweep IP, so in theory we
+    // must ARP for it again.
+    //
+    // However, since ARP isn't going to work per the above, we just force
+    // the destination MAC back to the target_mac.
+    // simply over-write the destination MAC rather than ARPing for it...
+    ether.forceDestMac(target_mac);
     ether.clientIcmpRequest(target_ip);
   }
 }
