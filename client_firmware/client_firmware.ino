@@ -129,6 +129,9 @@ void loop () {
     if (bitRead(state, MY_ID) && (millis() > absense_timer + ABSENSE_TIMEOUT)) {
       syslog("Absense timeout of target. Turning off light "MY_ID_CHAR);
       turn_my_house_off();
+      // Start looking for new target_ip; the DHCP reservation might time out
+      // and the device get a new address next time.
+      memcpy(target_ip, allOnes, sizeof target_ip);
     }
   }
 
