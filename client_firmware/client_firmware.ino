@@ -35,20 +35,20 @@
   (byte & 0x01 ? 1 : 0)
 #define STATE_ADDR 1
 
-const byte my_mac[] = {
+const uint8_t my_mac[] = {
   0x74,0x69,0x69,0x2D,0x30,MY_ID };
-const byte allZeros[] = {
+const uint8_t allZeros[] = {
   0x00, 0x00, 0x00, 0x00 };
-const byte allOnes[] = {
+const uint8_t allOnes[] = {
   0xFF, 0xFF, 0xFF, 0xFF };
 const char api_server[] PROGMEM = "etherhouse.xkyle.com";
 
 uint8_t target_mac[6] = {
   -1,-1,-1,-1,-1,-1 };
-byte target_ip[4] = {
+uint8_t target_ip[4] = {
   255, 255, 255, 255 };
-byte state = 0; //No houses on at first
-byte Ethernet::buffer[500];
+uint8_t state = 0; //No houses on at first
+uint8_t Ethernet::buffer[500];
 
 static long pinger_timer;
 static long absense_timer;

@@ -18,7 +18,7 @@ void get_target_mac() {
   wait_for_tcp();
 }
 
-static void macs_parse_callback (byte status, word off, word len) {
+static void macs_parse_callback (uint8_t status, word off, word len) {
   int seek_location = find_response(Ethernet::buffer + off, len);
   if (seek_location == -1) {
     Serial.println(F("Got a non-ok response from target_mac"));
@@ -55,7 +55,7 @@ void get_remote_state() {
   wait_for_tcp();
 }
 
-void state_parse_callback (byte status, word off, word len) {
+void state_parse_callback (uint8_t status, word off, word len) {
   int seek_location = find_response( Ethernet::buffer + off, len);
   if (seek_location == -1) {
     Serial.println(F("Got a non-ok response from state_parse"));
@@ -111,7 +111,7 @@ void api_set_on() {
   wait_for_tcp();
 }
 
-void api_set_callback (byte status, word off, word len) {
+void api_set_callback (uint8_t status, word off, word len) {
   Serial.println("Entering api_set_callback");
   int seek_location = find_response( Ethernet::buffer + off, len);
   if (seek_location == -1) {
@@ -124,7 +124,7 @@ void api_set_callback (byte status, word off, word len) {
 // find_response
 // Returns a integer offset where a http response starts.
 // Returns -1 if it couldn't find the delimiter between the headers and response
-int find_response(byte *haystack, int length) {
+int find_response(uint8_t *haystack, int length) {
   char needle[] = "\r\n\r\n";
   int foundpos = -1;
   int needle_length = sizeof needle - 1;
@@ -142,7 +142,7 @@ int find_response(byte *haystack, int length) {
   return foundpos;
 }
 
-bool is_200(byte *haystack, int length) {
+bool is_200(uint8_t *haystack, int length) {
   char needle[] = "200 OK";
   int needle_length = sizeof needle - 1;
   for (int i = 0; (i < length - needle_length); i++) {

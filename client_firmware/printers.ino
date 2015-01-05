@@ -10,7 +10,7 @@ void printMac(const uint8_t *macaddr) {
   Serial.println();
 }
 
-void printState(byte the_state) {
+void printState(uint8_t the_state) {
   Serial.println("Current state:");
   for (int i=NUM_HOUSES-1; i>=0; i--) {
     boolean onoroff = (state >> i) & 1;
