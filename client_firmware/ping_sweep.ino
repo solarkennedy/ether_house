@@ -15,6 +15,8 @@ void ping_sweep() {
   Serial.print(".0/24 subnet...");
   for (int i = 1; i < 255; i++) {
     ip[3] = i;
+    if (!memcmp(ip, EtherCard::myip, 4))
+        continue;
     // Don't care about replies, just want a ping sweep.
     // If ARP succeeded, we processed the ARP response in the sniffer,
     // so we saw/tested the MAC, so there's no need to ICMP ping.
