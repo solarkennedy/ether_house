@@ -1,5 +1,12 @@
 //callback that prints received packets to the serial port
 void packet_sniffer_callback(const uint8_t *src_mac, const uint8_t *src_ip) {
+  static bool sniffer_nested;
+
+  if (sniffer_nested)
+    return;
+
+  sniffer_nested = true;
+
   // If we got a packet, we need to reset the absense_timer so it can start counting down again
   // even if the packet isn't IP
   absense_timer = millis();
@@ -17,4 +24,6 @@ void packet_sniffer_callback(const uint8_t *src_mac, const uint8_t *src_ip) {
       memcpy(target_ip, src_ip, 4);
     }
   }
+
+  sniffer_nested = false;
 }
