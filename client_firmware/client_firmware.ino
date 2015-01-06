@@ -1,6 +1,5 @@
 #include <EEPROM.h>
 #include <EtherCard.h>
-#include <IPAddress.h>
 #include <avr/wdt.h>
 
 #define CSPIN 10
@@ -39,7 +38,7 @@
 
 const uint8_t my_mac[] = {
   0x74,0x69,0x69,0x2D,0x30,MY_ID };
-const uint8_t allZeros[] = {
+const uint8_t allZeros[] PROGMEM = {
   0x00, 0x00, 0x00, 0x00 };
 const uint8_t allOnes[] = {
   0xFF, 0xFF, 0xFF, 0xFF };
@@ -75,20 +74,20 @@ void setup () {
 
   wdt_reset();
   if (!ether.dhcpSetup()) {
-    syslog("DHCP failed");
+    syslog(F("DHCP failed"));
     reboot();
   }
 
   wdt_reset();
   if (!ether.dnsLookup(api_server)) {
-    syslog("DNS failed");
+    syslog(F("DNS failed"));
     reboot_after_delay();
   }
   memcpy(api_ip, ether.hisip, sizeof api_ip);
 
   print_netcfg();
 
-  syslog("etherhouse"MY_ID_CHAR" booted!");
+  syslog(F("etherhouse"MY_ID_CHAR" booted!"));
 
   wdt_reset();
   get_target_mac();
@@ -133,7 +132,7 @@ void loop () {
     wdt_reset();
     // Then if we are *still* here
     if (bitRead(state, MY_ID) && (millis() > absense_timer + ABSENSE_TIMEOUT)) {
-      syslog("Absense timeout of target. Turning off light "MY_ID_CHAR);
+      syslog(F("Absense timeout of target. Turning off light "MY_ID_CHAR));
       turn_my_house_off();
       // Start looking for new target_ip; the DHCP reservation might time out
       // and the device get a new address next time.
@@ -158,7 +157,7 @@ void loop () {
   }
 
   if (millis() > REBOOT_INTERVAL) {
-    syslog("Rebooting after 24 hours");
+    syslog(F("Rebooting after 24 hours"));
     reboot();
   }
 }

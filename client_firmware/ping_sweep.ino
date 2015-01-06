@@ -5,7 +5,7 @@ void ping_sweep() {
   ip[0] = ether.myip[0];
   ip[1] = ether.myip[1];
   ip[2] = ether.myip[2];
-  syslog("Starting Ping Sweep");
+  syslog(F("Starting Ping Sweep"));
   Serial.print("Pinging the ");
   Serial.print(ip[0]);
   Serial.print(".");
@@ -50,7 +50,7 @@ void ping_target() {
 
 // Filter to only look at packets that are coming from a legit ip.
 boolean is_ip_local(const uint8_t *ip) {
-  if (memcmp(ip, allOnes, 4) == 0 || memcmp(ip, allZeros, 4) == 0 ) {
+  if (memcmp(ip, allOnes, 4) == 0 || memcmp_P(ip, allZeros, 4) == 0 ) {
     return false;
   }
   for(int i = 0; i < 4; i++)
@@ -65,7 +65,7 @@ boolean is_ip_local(const uint8_t *ip) {
 // and initiates a reboot if not. This sometimes happens :(
 void validate_dhcp() {
   if (!is_ip_local(ether.myip)) {
-    syslog("Invalid dhcp");
+    syslog(F("Invalid dhcp"));
     reboot();
   }
 }

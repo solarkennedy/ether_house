@@ -1,4 +1,6 @@
-#define DBG_SNIFF 0
+#define DBG_SNIFF 1
+
+extern bool dump_pkt;
 
 // Simple packet sniffer
 //
@@ -12,7 +14,7 @@
 
 #define gPB ether.buffer
 
-#define SNIFFER_MAXLISTENERS 8    //the maximum number of port listeners.
+#define SNIFFER_MAXLISTENERS 1    //the maximum number of port listeners.
 
 typedef struct {
     SnifferCallback callback;
@@ -44,7 +46,7 @@ extern void printMac(const uint8_t *macaddr);
 #endif
 
 void EtherCard::snifferProcessPacket(uint16_t plen) {
-    const char *pkt_type;
+    const __FlashStringHelper *pkt_type;
     uint8_t *src_mac;
     uint8_t *src_ip;
 
@@ -98,7 +100,7 @@ Serial.println();
             return;
         }
         // We don't check the HW or protocol address length field, since we know they must be 6, 4 for Ethernet, IPv4
-        pkt_type = "ARP";
+        pkt_type = F("ARP");
         src_ip = &gPB[ETH_ARP_SRC_IP_P];
     }
     // IP packets
@@ -116,7 +118,7 @@ Serial.println();
             return;
         }
 
-        pkt_type = "IP";
+        pkt_type = F("IP");
         src_ip = &gPB[IP_SRC_P];
     }
     else
@@ -143,7 +145,15 @@ Serial.println();
 
     for(int i = 0; i < numSniffers; i++)
     {
-        if(check_mac_message_is_from(src_mac, sniffers[i].srcmacaddr))
+        if(check_mac_message_is_from(src_mac, sniffers[i].srcmacaddr)) {
+#if DBG_SNIFF
+Serial.print(F("packet matched MAC "));
+Serial.print(i);
+Serial.print(F(" "));
+printMac(sniffers[i].srcmacaddr);
+Serial.println();
+#endif
             sniffers[i].callback(src_mac, src_ip);
+        }
     }
 }

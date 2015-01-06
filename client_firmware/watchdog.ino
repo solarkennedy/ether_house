@@ -1,11 +1,11 @@
 void reboot() {
-  syslog("Rebooting now.");
+  syslog(F("Rebooting now."));
   delay(100);
   asm volatile ("  jmp 0");  
 }
 
 void reboot_after_delay() {
-  syslog("Delayed reboot initiated.");
+  syslog(F("Delayed reboot initiated."));
   wdt_reset();
   delay(7000);
   wdt_reset();

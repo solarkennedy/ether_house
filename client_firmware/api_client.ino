@@ -4,7 +4,7 @@ void get_target_mac() {
     return;
   }
   validate_dhcp();
-  syslog("Retrieving target MAC address from server...");
+  syslog(F("Retrieving target MAC address from server..."));
   memcpy(ether.hisip, api_ip, sizeof ether.hisip);
   ether.browseUrl(PSTR("/target_mac?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "" , api_server, macs_parse_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
@@ -12,7 +12,7 @@ void get_target_mac() {
   while (locked) {
     ether.packetLoop(ether.packetReceive());
     if (millis() > timer) {
-      syslog("Timeout occured when trying to get mac");
+      syslog(F("Timeout occured when trying to get mac"));
       reboot();
     }
   }
@@ -42,7 +42,7 @@ void get_remote_state() {
   }
   validate_dhcp();
   Serial.println();
-  syslog("Syncing State from Server.");
+  syslog(F("Syncing State from Server."));
   memcpy(ether.hisip, api_ip, sizeof ether.hisip);
   ether.browseUrl(PSTR("/state?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, state_parse_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
@@ -50,7 +50,7 @@ void get_remote_state() {
   while (locked) {
     ether.packetLoop(ether.packetReceive());
     if (millis() > timer) {
-      syslog("Timeout occured when trying to fetch state");
+      syslog(F("Timeout occured when trying to fetch state"));
       reboot_after_delay();
     }
   }
@@ -79,7 +79,7 @@ void api_set_off() {
     return;
   }
   validate_dhcp();
-  syslog("Sending OFF for my house: "MY_ID_CHAR);
+  syslog(F("Sending OFF for my house: "MY_ID_CHAR));
   memcpy(ether.hisip, api_ip, sizeof ether.hisip);
   ether.browseUrl(PSTR("/off?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
@@ -87,7 +87,7 @@ void api_set_off() {
   while (locked) {
     ether.packetLoop(ether.packetReceive());
     if (millis() > timer) {
-      syslog("Timeout occured when trying to set on/off");
+      syslog(F("Timeout occured when trying to set on/off"));
       reboot_after_delay();
     }
   }
@@ -100,7 +100,7 @@ void api_set_on() {
     return;
   }
   validate_dhcp();
-  syslog("Sending ON for my house: "MY_ID_CHAR);
+  syslog(F("Sending ON for my house: "MY_ID_CHAR));
   memcpy(ether.hisip, api_ip, sizeof ether.hisip);
   ether.browseUrl(PSTR("/on?id=" MY_ID_CHAR "&api_key=" MY_API_KEY), "", api_server, api_set_callback);
   uint32_t timer = millis() + HTTP_TIMEOUT;
@@ -108,7 +108,7 @@ void api_set_on() {
   while (locked) {
     ether.packetLoop(ether.packetReceive());
     if (millis() > timer) {
-      syslog("Timeout occured when trying to set on/off");
+      syslog(F("Timeout occured when trying to set on/off"));
       reboot_after_delay();
     }
   }
@@ -129,11 +129,11 @@ void api_set_callback (uint8_t status, word off, word len) {
 // Returns a integer offset where a http response starts.
 // Returns -1 if it couldn't find the delimiter between the headers and response
 int find_response(uint8_t *haystack, int length) {
-  char needle[] = "\r\n\r\n";
+  static const char needle[] PROGMEM = "\r\n\r\n";
   int foundpos = -1;
   int needle_length = sizeof needle - 1;
   for (int i = 0; (i < length - needle_length); i++) {
-    if (memcmp(needle, haystack + i, needle_length) == 0) {
+    if (memcmp_P(haystack + i, needle, needle_length) == 0) {
       foundpos = i;
       if (is_200(haystack, length)) {
         return foundpos + needle_length;
@@ -147,10 +147,10 @@ int find_response(uint8_t *haystack, int length) {
 }
 
 bool is_200(uint8_t *haystack, int length) {
-  char needle[] = "200 OK";
+  static const char needle[] PROGMEM = "200 OK";
   int needle_length = sizeof needle - 1;
   for (int i = 0; (i < length - needle_length); i++) {
-    if (memcmp(needle, haystack + i, needle_length) == 0) {
+    if (memcmp_P(haystack + i, needle, needle_length) == 0) {
       return true;
     }
   }

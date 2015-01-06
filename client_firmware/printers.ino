@@ -1,7 +1,7 @@
 void printMac(const uint8_t *macaddr) {
   Serial.print(macaddr[0], HEX);
   int i;
-  char tmp[16];
+  char tmp[3];
   for (i=1; i<6; i++) {
     sprintf(tmp, "%.2X",macaddr[i]);
     Serial.print(':');
