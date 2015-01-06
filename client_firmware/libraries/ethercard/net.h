@@ -38,7 +38,10 @@
 // start of arp header:
 #define ETH_ARP_P 0xe
 //
-#define ETHTYPE_ARP_L_V 0x06
+#define ETH_ARP_PROTO_TYPE_H_P 0x10
+#define ETH_ARP_PROTO_TYPE_L_P 0x11
+#define ETH_ARP_PROTO_IPV4_H_V 0x08
+#define ETH_ARP_PROTO_IPV4_L_V 0x00
 // arp.dst.ip
 #define ETH_ARP_DST_IP_P 0x26
 // arp.opcode

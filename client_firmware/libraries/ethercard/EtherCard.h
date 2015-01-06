@@ -47,10 +47,8 @@ typedef void (*UdpServerCallback)(
 
 /** This type definition defines the structure of a sniffe/ event handler callback funtion */
 typedef void (*SnifferCallback)(
-    uint8_t srcmacaddr[6], // Source mac address
-    uint8_t src_ip[4],    ///< IP address of the sender
-    const char *data,   ///< UDP payload data
-    uint16_t len);        ///< Length of the payload data
+    const uint8_t *src_mac, ///< Source mac address
+    const uint8_t *src_ip); ///< IP address of the sender
 
 /** This type definition defines the structure of a DHCP Option callback funtion */
 typedef void (*DhcpOptionCallback)(
@@ -282,7 +280,6 @@ public:
     *     @note   Only handles ARP and IP
     */
     static uint16_t packetLoop (uint16_t plen);
-    static uint16_t customPacketLoop (uint16_t plen);
 
     /**   @brief  Accept a TCP/IP connection
     *     @param  port IP port to accept on - do nothing if wrong port
@@ -317,20 +314,33 @@ public:
     static void updateBroadcastAddress();
 
     /**   @brief  Check if got gateway hardware address (ARP lookup)
-    *     @return <i>unit8_t</i> True if gateway found
+    *     @return <i>uint8_t</i> True if waiting for gateway
     */
     static uint8_t clientWaitingGw ();
 
     /**   @brief  Check if got gateway DNS address (ARP lookup)
-    *     @return <i>unit8_t</i> True if DNS found
+    *     @return <i>uint8_t</i> True if waiting for DNS
     */
     static uint8_t clientWaitingDns ();
+
+    /**   @brief  Select the destination IP to communicat with, and ARP it if required
+    */
+    static void selectAndArpDestAddr (const uint8_t *destip, uint16_t timeout);
+
+    /**   @brief  Select the destination MAC to communicate with
+    */
+    static void forceDestMac (const uint8_t *destmac);
+
+    /**   @brief  Check if got MAC address to communicate with selected dest IP
+    *     @return <i>uint8_t</i> True if waiting for dest MAC address
+    */
+    static uint8_t clientWaitingDestAddr ();
 
     /**   @brief  Prepare a TCP request
     *     @param  result_cb Pointer to callback function that handles TCP result
     *     @param  datafill_cb Pointer to callback function that handles TCP data payload
     *     @param  port Remote TCP/IP port to connect to
-    *     @return <i>unit8_t</i> ID of TCP/IP session (0-7)
+    *     @return <i>uint8_t</i> ID of TCP/IP session (0-7)
     *     @note   Return value provides id of the request to allow up to 7 concurrent requests
     */
     static uint8_t clientTcpReq (uint8_t (*result_cb)(uint8_t,uint8_t,uint16_t,uint16_t),
@@ -449,19 +459,17 @@ public:
     */
     static void udpServerListenOnPort(UdpServerCallback callback, uint16_t port);
 
-    static void snifferListenForMac(SnifferCallback callback, uint8_t srcmacaddr[6]);
+    static void snifferListenForMac(SnifferCallback callback, const uint8_t *srcmacaddr);
 
     /**   @brief  Pause listing on UDP port
     *     @brief  port Port to pause
     */
     static void udpServerPauseListenOnPort(uint16_t port);
-    static void snifferPauseListenForMac(uint8_t srcmacaddr[6]);
 
     /**   @brief  Resume listing on UDP port
     *     @brief  port Port to pause
     */
     static void udpServerResumeListenOnPort(uint16_t port);
-    static void snifferResumeListenForMac(uint8_t srcmacaddr[6]);
 
     /**   @brief  Check if UDP server is listening on any ports
     *     @return <i>bool</i> True if listening on any ports
@@ -474,7 +482,7 @@ public:
     *     @return <i>bool</i> True if packet processed
     */
     static bool udpServerHasProcessedPacket(uint16_t len);    //called by tcpip, in packetLoop
-    static bool snifferProcessPacket(uint16_t len);    //called by tcpip, in packetLoop
+    static void snifferProcessPacket(uint16_t len);    //called by tcpip, in packetLoop
 
     // dhcp.cpp
     /**   @brief  Update DHCP state
@@ -559,7 +567,7 @@ public:
     *     @param  strbuf Pointer to buffer to hold null terminated result string
     *     @param  maxlen Maximum length of result
     *     @param  key Pointer to null terminated string holding the key to search for
-    *     @return <i>unit_t</i> Length of the value. 0 if not found
+    *     @return <i>uint8_t</i> Length of the value. 0 if not found
     *     @note   Ensure strbuf has memory allocated of at least maxlen + 1 (to accomodate result plus terminating null)
     */
     static uint8_t findKeyVal(const char *str,char *strbuf,

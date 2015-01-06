@@ -17,17 +17,17 @@ void turn_my_house_off() {
 void toggle_house(int house, boolean value) {
   // If the state is actually different than what we currently have
   if (bitRead(state, house) != value) {
-    Serial.print(F("Turning house ")); 
+    Serial.print(F("Turning house "));
     Serial.print(house);
-    Serial.print(F(" to value ")); 
+    Serial.print(F(" to value "));
     Serial.println(value);
     bitWrite(state, house, value);
     sync_leds();
     // If we are toggling our house, then we need to let the server
     // know that our state changed.
-    if (house == MY_ID && value == true)
+    if (house == MY_ID && value)
       api_set_on();
-    else if (house == MY_ID && value == false)
+    else if (house == MY_ID && !value)
       api_set_off();
   }
 }

@@ -1,17 +1,18 @@
 #include <EEPROM.h>
 #include <EtherCard.h>
-#include <IPAddress.h>
 #include <avr/wdt.h>
 
 #define CSPIN 10
 // NOTE: All of these timers are in Milliseconds!
-// Ping our target every 2 seconds
-#define PINGER_INTERVAL 2000
+// Ping our target every 60 seconds
+#define PINGER_INTERVAL 60000
+// If target IP isn't known, ping sweep this often
+#define PINGSWEEP_INTERVAL_FIND_TARGET 60000
 // Ping everything every hour
-#define PINGSWEEP_INTERVAL 3600000
+#define PINGSWEEP_INTERVAL_RESCAN 3600000
 // How often to check back to the server for sync updates
 #define SYNC_INTERVAL 300000
-// General timeout for API calls and such. Needs to be lower than the 8S watchdog!
+// General timeout for API calls and such. Needs to be lower than the 8s watchdog!
 #define HTTP_TIMEOUT 5000
 // A device is gone if we haven't heard from them in 15 minutes
 #define ABSENSE_TIMEOUT 900000
@@ -32,23 +33,24 @@
   (byte & 0x08 ? 1 : 0), \
   (byte & 0x04 ? 1 : 0), \
   (byte & 0x02 ? 1 : 0), \
-  (byte & 0x01 ? 1 : 0) 
+  (byte & 0x01 ? 1 : 0)
 #define STATE_ADDR 1
 
-const byte my_mac[] = { 
+const uint8_t my_mac[] = {
   0x74,0x69,0x69,0x2D,0x30,MY_ID };
-const byte allZeros[] = { 
+const uint8_t allZeros[] PROGMEM = {
   0x00, 0x00, 0x00, 0x00 };
-const byte allOnes[] = { 
+const uint8_t allOnes[] = {
   0xFF, 0xFF, 0xFF, 0xFF };
 const char api_server[] PROGMEM = "etherhouse.xkyle.com";
 
-uint8_t target_mac[6] = {   
+uint8_t target_mac[6] = {
   -1,-1,-1,-1,-1,-1 };
-byte target_ip[4] = { 
+uint8_t target_ip[4] = {
   255, 255, 255, 255 };
-byte state = 0; //No houses on at first
-byte Ethernet::buffer[500];
+uint8_t api_ip[4];
+uint8_t state = 0; //No houses on at first
+uint8_t Ethernet::buffer[500];
 
 static long pinger_timer;
 static long absense_timer;
@@ -72,44 +74,47 @@ void setup () {
 
   wdt_reset();
   if (!ether.dhcpSetup()) {
-    syslog("DHCP failed");
+    syslog(F("DHCP failed"));
     reboot();
   }
 
   wdt_reset();
   if (!ether.dnsLookup(api_server)) {
-    syslog("DNS failed");
+    syslog(F("DNS failed"));
     reboot_after_delay();
   }
+  memcpy(api_ip, ether.hisip, sizeof api_ip);
 
   print_netcfg();
 
-  syslog("etherhouse"MY_ID_CHAR" booted!");
+  syslog(F("etherhouse"MY_ID_CHAR" booted!"));
 
   wdt_reset();
   get_target_mac();
   wdt_reset();
-  get_remote_state(); 
+  get_remote_state();
   wdt_reset();
 
   Serial.println(F("Finished initial configuration"));
   Serial.println(F("Now entering main loop\n"));
 
   // Setup timers
-  pinger_timer = millis() - PINGER_INTERVAL ; 
+  pinger_timer = millis() - PINGER_INTERVAL ;
   // Start the absense timer with the total grace period to give it the benifit of the doubt
   absense_timer = millis();
   // We can start the ping sweep on bootup.
-  pingsweep_timer = millis() - PINGSWEEP_INTERVAL;
+  pingsweep_timer = millis() - PINGSWEEP_INTERVAL_FIND_TARGET;
   // We already got the state from above. Setup the next issue.
   sync_timer = millis();
 
 }
 
 void loop () {
+  long pingsweep_interval;
+
   wdt_reset();
   // Normal loop of getting packets if they are available
-  ether.customPacketLoop(ether.packetReceive());
+  ether.packetLoop(ether.packetReceive());
   wdt_reset();
 
   // Ping our target to see if they are alive
@@ -120,20 +125,28 @@ void loop () {
 
   // If we haven't heard from our device, time to time out and turn off
   // The sniffer callback resets the absense_timer
-  if ((bitRead(state, MY_ID) == true) && (millis() > absense_timer + ABSENSE_TIMEOUT)) {
+  if (bitRead(state, MY_ID) && (millis() > absense_timer + ABSENSE_TIMEOUT)) {
     // At the last second, let's try a last-ditch ping sweep.
     pingsweep_timer = millis();
     ping_sweep();
     wdt_reset();
     // Then if we are *still* here
-    if ((bitRead(state, MY_ID) == true) && (millis() > absense_timer + ABSENSE_TIMEOUT)) {
-      syslog("Absense timeout of target. Turning off light "MY_ID_CHAR);
+    if (bitRead(state, MY_ID) && (millis() > absense_timer + ABSENSE_TIMEOUT)) {
+      syslog(F("Absense timeout of target. Turning off light "MY_ID_CHAR));
       turn_my_house_off();
+      // Start looking for new target_ip; the DHCP reservation might time out
+      // and the device get a new address next time.
+      memcpy(target_ip, allOnes, sizeof target_ip);
     }
   }
 
+  // If we don't yet know the target_ip, ping sweep fairly often to find it. Otherwise:
   // After a long time we ping everything in case we don't even know what ip our device has
-  if (millis() > pingsweep_timer + PINGSWEEP_INTERVAL) {
+  if (!memcmp(target_ip, allOnes, sizeof target_ip))
+    pingsweep_interval = PINGSWEEP_INTERVAL_FIND_TARGET;
+  else
+    pingsweep_interval = PINGSWEEP_INTERVAL_RESCAN;
+  if (millis() > pingsweep_timer + pingsweep_interval) {
     pingsweep_timer = millis();
     ping_sweep();
   }
@@ -144,8 +157,7 @@ void loop () {
   }
 
   if (millis() > REBOOT_INTERVAL) {
-    syslog("Rebooting after 24 hours");
+    syslog(F("Rebooting after 24 hours"));
     reboot();
   }
-
 }
