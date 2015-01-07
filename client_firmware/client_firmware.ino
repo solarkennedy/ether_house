@@ -2,7 +2,7 @@
 #include <EtherCard.h>
 #include <avr/wdt.h>
 
-#define CSPIN 10
+#define CS_PIN 10
 // NOTE: All of these timers are in Milliseconds!
 // Ping our target every 2 seconds
 #define PINGER_INTERVAL 2000
@@ -67,7 +67,7 @@ void setup () {
   readStateFromEeprom();
 
   wdt_reset();
-  if (ether.begin(sizeof Ethernet::buffer, my_mac, CSPIN) == 0) {
+  if (ether.begin(sizeof Ethernet::buffer, my_mac, CS_PIN) == 0) {
     Serial.println(F("Failed to access Ethernet controller"));
     reboot();
   }
