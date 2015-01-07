@@ -3,21 +3,25 @@
 #include <avr/wdt.h>
 
 #define CS_PIN 10
+
+#define SECONDS 1000
+#define MINUTES (SECONDS * 60)
+#define HOURS (MINUTES * 60)
 // NOTE: All of these timers are in Milliseconds!
 // Ping our target every 2 seconds
-#define PINGER_INTERVAL 2000
+#define PINGER_INTERVAL (2 * SECONDS)
 // If target IP isn't known, ping sweep this often
-#define PINGSWEEP_INTERVAL_FIND_TARGET 60000
+#define PINGSWEEP_INTERVAL_FIND_TARGET (1 * MINUTES)
 // Ping everything every hour
-#define PINGSWEEP_INTERVAL_RESCAN 3600000
+#define PINGSWEEP_INTERVAL_RESCAN (1 * HOURS)
 // How often to check back to the server for sync updates
-#define SYNC_INTERVAL 300000
+#define SYNC_INTERVAL (5 * MINUTES)
 // General timeout for API calls and such. Needs to be lower than the 8s watchdog!
-#define HTTP_TIMEOUT 5000
+#define HTTP_TIMEOUT (5 * SECONDS)
 // A device is gone if we haven't heard from them in 15 minutes
-#define ABSENSE_TIMEOUT 900000
+#define ABSENSE_TIMEOUT (15 * MINUTES)
 // Reboot the entire thing every 24 hours for good measure.
-#define REBOOT_INTERVAL 86400000
+#define REBOOT_INTERVAL (24 * HOURS)
 
 #define NUM_HOUSES 8
 #define MY_ID 0
