@@ -4,8 +4,8 @@
 
 #define CSPIN 10
 // NOTE: All of these timers are in Milliseconds!
-// Ping our target every 60 seconds
-#define PINGER_INTERVAL 60000
+// Ping our target every 2 seconds
+#define PINGER_INTERVAL 2000
 // If target IP isn't known, ping sweep this often
 #define PINGSWEEP_INTERVAL_FIND_TARGET 60000
 // Ping everything every hour
