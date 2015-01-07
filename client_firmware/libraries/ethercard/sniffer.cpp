@@ -1,6 +1,4 @@
-#define DBG_SNIFF 1
-
-extern bool dump_pkt;
+#define DBG_SNIFF 0
 
 // Simple packet sniffer
 //
