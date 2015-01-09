@@ -4,9 +4,9 @@
 
 #define CS_PIN 10
 
-#define SECONDS 1000
-#define MINUTES (SECONDS * 60)
-#define HOURS (MINUTES * 60)
+#define SECONDS 1000L
+#define MINUTES (60 * SECONDS)
+#define HOURS (60 * MINUTES)
 // NOTE: All of these timers are in Milliseconds!
 // Ping our target every 2 seconds
 #define PINGER_INTERVAL (2 * SECONDS)
