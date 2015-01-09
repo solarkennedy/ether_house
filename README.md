@@ -64,14 +64,14 @@ is slightly modified in order to sniff packets from a selected MAC address.
 
 The Arduino runs a limited TCP/IP stack and interacts with the http api.
 
-The code is writen with basic error detection and reboot capabilities, to ensure
+The code is written with basic error detection and reboot capabilities, to ensure
 the client continues to run without interruption or interaction. No one should
 need to "turn it off and on again."
 
 In summary:
 
-* Arduino firwmare (client)
-  * Queries the server for configruation (target mac address)
+* Arduino firmware (client)
+  * Queries the server for configuration (target mac address)
   * Listens for packets from the targets cell phone
   * Updates the server when the target comes home or leaves
   * Periodically polls the server for state updates
@@ -87,7 +87,7 @@ In summary:
 * Make the hardware
 * Pick secrets (API keys + MAC addresses)
 * Program the arduino with a particular house\_id and api key
-* Run the server with syncronized secrets
+* Run the server with synchronized secrets
 
 #### Syslog
 
