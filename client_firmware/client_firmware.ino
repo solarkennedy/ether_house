@@ -110,6 +110,8 @@ void setup () {
   // We already got the state from above. Setup the next issue.
   sync_timer = millis();
 
+  Ethernet::enableBroadcast();
+  Ethernet::enableMulticast();
 }
 
 void loop () {
