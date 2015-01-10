@@ -38,7 +38,6 @@
   (byte & 0x04 ? 1 : 0), \
   (byte & 0x02 ? 1 : 0), \
   (byte & 0x01 ? 1 : 0)
-#define STATE_ADDR 1
 
 const uint8_t my_mac[] = {
   0x74,0x69,0x69,0x2D,0x30,MY_ID };
@@ -141,6 +140,7 @@ void loop () {
       // Start looking for new target_ip; the DHCP reservation might time out
       // and the device get a new address next time.
       memcpy(target_ip, allOnes, sizeof target_ip);
+      saveStateToEeprom();
     }
   }
 

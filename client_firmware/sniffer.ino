@@ -22,6 +22,7 @@ void packet_sniffer_callback(const uint8_t *src_mac, const uint8_t *src_ip) {
       ether.printIp(src_ip);
       Serial.println();
       memcpy(target_ip, src_ip, 4);
+      saveStateToEeprom();
     }
   }
 
