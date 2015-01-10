@@ -8,7 +8,7 @@
 #define MINUTES (60 * SECONDS)
 #define HOURS (60 * MINUTES)
 // NOTE: All of these timers are in Milliseconds!
-// Ping our target every 2 seconds
+// Ping our target every 2 seconds, if we haven't seen traffic from it
 #define PINGER_INTERVAL (2 * SECONDS)
 // If target IP isn't known, ping sweep this often
 #define PINGSWEEP_INTERVAL_FIND_TARGET (1 * MINUTES)
@@ -102,7 +102,7 @@ void setup () {
   Serial.println(F("Now entering main loop\n"));
 
   // Setup timers
-  pinger_timer = millis() - PINGER_INTERVAL ;
+  pinger_timer = millis();
   // Start the absense timer with the total grace period to give it the benifit of the doubt
   absense_timer = millis();
   // We can start the ping sweep on bootup.
@@ -125,7 +125,8 @@ void loop () {
   // Ping our target to see if they are alive
   if (millis() > pinger_timer + PINGER_INTERVAL) {
     pinger_timer = millis();
-    ping_target();
+    if (millis() > absense_timer + PINGER_INTERVAL)
+      ping_target();
   }
 
   // If we haven't heard from our device, time to time out and turn off
