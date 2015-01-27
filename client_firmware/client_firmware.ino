@@ -8,7 +8,7 @@
 #define MINUTES (60 * SECONDS)
 #define HOURS (60 * MINUTES)
 // NOTE: All of these timers are in Milliseconds!
-// Ping our target every 2 seconds
+// Ping our target every 2 seconds, if we haven't seen traffic from it
 #define PINGER_INTERVAL (2 * SECONDS)
 // If target IP isn't known, ping sweep this often
 #define PINGSWEEP_INTERVAL_FIND_TARGET (1 * MINUTES)
@@ -38,7 +38,6 @@
   (byte & 0x04 ? 1 : 0), \
   (byte & 0x02 ? 1 : 0), \
   (byte & 0x01 ? 1 : 0)
-#define STATE_ADDR 1
 
 const uint8_t my_mac[] = {
   0x74,0x69,0x69,0x2D,0x30,MY_ID };
@@ -103,7 +102,7 @@ void setup () {
   Serial.println(F("Now entering main loop\n"));
 
   // Setup timers
-  pinger_timer = millis() - PINGER_INTERVAL ;
+  pinger_timer = millis();
   // Start the absense timer with the total grace period to give it the benifit of the doubt
   absense_timer = millis();
   // We can start the ping sweep on bootup.
@@ -111,6 +110,8 @@ void setup () {
   // We already got the state from above. Setup the next issue.
   sync_timer = millis();
 
+  Ethernet::enableBroadcast();
+  Ethernet::enableMulticast();
 }
 
 void loop () {
@@ -124,7 +125,8 @@ void loop () {
   // Ping our target to see if they are alive
   if (millis() > pinger_timer + PINGER_INTERVAL) {
     pinger_timer = millis();
-    ping_target();
+    if (millis() > absense_timer + PINGER_INTERVAL)
+      ping_target();
   }
 
   // If we haven't heard from our device, time to time out and turn off
@@ -141,6 +143,7 @@ void loop () {
       // Start looking for new target_ip; the DHCP reservation might time out
       // and the device get a new address next time.
       memcpy(target_ip, allOnes, sizeof target_ip);
+      saveStateToEeprom();
     }
   }
 
